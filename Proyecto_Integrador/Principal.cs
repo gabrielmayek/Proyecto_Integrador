@@ -3,9 +3,22 @@ namespace Proyecto_Integrador
 {
     public partial class Principal : Form
     {
+
         public Principal()
         {
+
+
             InitializeComponent();
+            var datos = new datos(); // Crea una instancia de la clase datos
+            datos.CargarCombo(cmbMedicamentos); // Llama al método para probar la conexión a la base de datos
+
+
+            cmbMedicamentos.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cmbMedicamentos.AutoCompleteSource = AutoCompleteSource.ListItems;
+            cmbMedicamentos.Text = "Selecciona un medicamento"; // Establece el texto predeterminado del ComboBox
+            cmbMedicamentos.Font = new Font("Verdana", 14);
+
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -82,6 +95,36 @@ namespace Proyecto_Integrador
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void cmbMedicamentos_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guardarbtn_Click(object sender, EventArgs e)
+        {
+            string nombres = txtNombres.Text;
+            string apellidoMaterno = txtApellidoMeterno.Text;
+            string apellidoPaterno = txtApellidoPaterno.Text;
+            string curp = txtCurp.Text;
+            var datos = new datos(); // Crea una instancia de la clase datos
+            Dictionary<string, object> datospersonales = new Dictionary<string, object>// Crea un diccionario para almacenar los datos personales
+            {
+                { "curp", curp },
+                { "nombres", nombres },
+                { "apellido_materno", apellidoMaterno },
+                { "apellido_paterno", apellidoPaterno }
+            };
+            int idInsertado = datos.Insertar("datos_personales", datospersonales); // Inserta los datos del medicamento en la base de datos
+            if (idInsertado > 0)
+            {
+                MessageBox.Show($"Medicamento registrado con éxito. ID: {idInsertado}");
+            }
+            else
+            {
+                MessageBox.Show("Error al registrar el medicamento.");
+            }
         }
     }
 }

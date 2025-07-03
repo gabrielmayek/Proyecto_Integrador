@@ -41,7 +41,7 @@ namespace Proyecto_Integrador
             Registar = new TabPage();
             panel2 = new Panel();
             dataGridView1 = new DataGridView();
-            btnAgregarMas = new Button();
+            btnguardar = new Button();
             textBox5 = new TextBox();
             cmbMedicamentos = new ComboBox();
             rbtnNOExpediente = new RadioButton();
@@ -75,7 +75,7 @@ namespace Proyecto_Integrador
             tabControlMenu = new TabControl();
             Mensajebienvenida = new TabPage();
             label4 = new Label();
-            btnguardar = new Button();
+            guardarbtn = new Button();
             panel1.SuspendLayout();
             Historial.SuspendLayout();
             Activos.SuspendLayout();
@@ -202,9 +202,9 @@ namespace Proyecto_Integrador
             // 
             panel2.AutoScroll = true;
             panel2.BackColor = Color.FromArgb(129, 166, 100);
+            panel2.Controls.Add(guardarbtn);
             panel2.Controls.Add(dataGridView1);
             panel2.Controls.Add(btnguardar);
-            panel2.Controls.Add(btnAgregarMas);
             panel2.Controls.Add(textBox5);
             panel2.Controls.Add(cmbMedicamentos);
             panel2.Controls.Add(rbtnNOExpediente);
@@ -249,20 +249,20 @@ namespace Proyecto_Integrador
             dataGridView1.Size = new Size(857, 188);
             dataGridView1.TabIndex = 6;
             // 
-            // btnAgregarMas
+            // btnguardar
             // 
-            btnAgregarMas.BackColor = Color.FromArgb(177, 232, 134);
-            btnAgregarMas.FlatAppearance.BorderColor = Color.FromArgb(128, 255, 128);
-            btnAgregarMas.FlatAppearance.BorderSize = 2;
-            btnAgregarMas.FlatStyle = FlatStyle.Popup;
-            btnAgregarMas.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnAgregarMas.Location = new Point(741, 1105);
-            btnAgregarMas.Name = "btnAgregarMas";
-            btnAgregarMas.Size = new Size(214, 43);
-            btnAgregarMas.TabIndex = 3;
-            btnAgregarMas.Text = "Agregar mas";
-            btnAgregarMas.UseVisualStyleBackColor = false;
-            btnAgregarMas.Click += btnActivos_Click;
+            btnguardar.BackColor = Color.FromArgb(177, 232, 134);
+            btnguardar.FlatAppearance.BorderColor = Color.FromArgb(128, 255, 128);
+            btnguardar.FlatAppearance.BorderSize = 2;
+            btnguardar.FlatStyle = FlatStyle.Popup;
+            btnguardar.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnguardar.Location = new Point(741, 1476);
+            btnguardar.Name = "btnguardar";
+            btnguardar.Size = new Size(214, 43);
+            btnguardar.TabIndex = 3;
+            btnguardar.Text = "Guardar";
+            btnguardar.UseVisualStyleBackColor = false;
+            btnguardar.Click += btnActivos_Click;
             // 
             // textBox5
             // 
@@ -274,11 +274,13 @@ namespace Proyecto_Integrador
             // 
             // cmbMedicamentos
             // 
+            cmbMedicamentos.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
             cmbMedicamentos.FormattingEnabled = true;
             cmbMedicamentos.Location = new Point(41, 714);
             cmbMedicamentos.Name = "cmbMedicamentos";
-            cmbMedicamentos.Size = new Size(260, 45);
+            cmbMedicamentos.Size = new Size(260, 36);
             cmbMedicamentos.TabIndex = 4;
+            cmbMedicamentos.SelectedIndexChanged += cmbMedicamentos_SelectedIndexChanged;
             // 
             // rbtnNOExpediente
             // 
@@ -610,20 +612,15 @@ namespace Proyecto_Integrador
             label4.TabIndex = 3;
             label4.Text = "Bienvenido";
             // 
-            // btnguardar
+            // guardarbtn
             // 
-            btnguardar.BackColor = Color.FromArgb(177, 232, 134);
-            btnguardar.FlatAppearance.BorderColor = Color.FromArgb(128, 255, 128);
-            btnguardar.FlatAppearance.BorderSize = 2;
-            btnguardar.FlatStyle = FlatStyle.Popup;
-            btnguardar.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnguardar.Location = new Point(741, 1476);
-            btnguardar.Name = "btnguardar";
-            btnguardar.Size = new Size(214, 43);
-            btnguardar.TabIndex = 3;
-            btnguardar.Text = "Guardar";
-            btnguardar.UseVisualStyleBackColor = false;
-            btnguardar.Click += btnActivos_Click;
+            guardarbtn.Location = new Point(703, 1203);
+            guardarbtn.Name = "guardarbtn";
+            guardarbtn.Size = new Size(167, 52);
+            guardarbtn.TabIndex = 7;
+            guardarbtn.Text = "button1";
+            guardarbtn.UseVisualStyleBackColor = true;
+            guardarbtn.Click += guardarbtn_Click;
             // 
             // Principal
             // 
@@ -706,8 +703,8 @@ namespace Proyecto_Integrador
         private TextBox txtCantidad;
         private TextBox txtAlergias;
         private DataGridView dataGridView1;
-        private Button btnAgregarMas;
         private Label label18;
         private Button btnguardar;
+        private Button guardarbtn;
     }
 }
