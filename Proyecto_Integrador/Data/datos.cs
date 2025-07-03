@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using Proyecto_Integrador.Data;
 
 namespace Proyecto_Integrador.Data
 {
@@ -24,7 +25,7 @@ namespace Proyecto_Integrador.Data
                 return;// Salir del método si la conexión falla
             }
             conexion.Close();// Cerrar la conexión después de probarla
-            MessageBox.Show("Conexión exitosa a la base de datos.");// Mostrar un mensaje de éxito si la conexión se abre correctamente
+                             // MessageBox.Show("Conexión exitosa a la base de datos.");// Mostrar un mensaje de éxito si la conexión se abre correctamente
         }
 
         // Método para insertar datos en una tabla específica de la base de datos
@@ -76,10 +77,13 @@ namespace Proyecto_Integrador.Data
 
 
         }
-        public void CargarCombo()
+        public void CargarCombo(ComboBox comboBox)
         {
             // Método para cargar un ComboBox con los nombres de los medicamentos desde la base de datos
-            string query = "select nombre from medicamento";
+
+            string query = "SELECT nombre_medicamento FROM medicamento";
+            List<Medicamento> listaMedicamentos = new List<Medicamento>();
+
             using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
             {
                 MySqlCommand command = new MySqlCommand(query, connection);
@@ -89,21 +93,28 @@ namespace Proyecto_Integrador.Data
                     MySqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        string nombreMedicamento = reader.GetString(0);
-                        // Aquí puedes agregar el nombre del medicamento al ComboBox
-                        // comboBoxMedicamentos.Items.Add(nombreMedicamento);
+                        listaMedicamentos.Add(new Medicamento
+                        {
+                          
+                            Nombre = reader.GetString("nombre_medicamento")
+                        });
                     }
+
+                    comboBox.DataSource = listaMedicamentos;
+                    comboBox.DisplayMember = "Nombre"; // Lo que se muestra
+
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error al cargar los medicamentos: {ex.Message}");
                 }
+
+
+
             }
 
 
+
         }
-
-
-
     }
 }
