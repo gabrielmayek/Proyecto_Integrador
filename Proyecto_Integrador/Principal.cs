@@ -17,7 +17,7 @@ namespace Proyecto_Integrador
             cmbMedicamentos.AutoCompleteSource = AutoCompleteSource.ListItems;
             cmbMedicamentos.Text = "Selecciona un medicamento"; // Establece el texto predeterminado del ComboBox
             cmbMedicamentos.Font = new Font("Verdana", 14);
-
+            dtimeEntrada.Font = new Font("Verdana",12 );
 
         }
 
@@ -80,15 +80,6 @@ namespace Proyecto_Integrador
 
         private void panel2_Paint(object sender, PaintEventArgs e)
         {
-            string Nombres = txtNombres.Text; // Obtiene el texto del campo de nombres
-            string AppellidoMaterno = txtApellidoMeterno.Text; // Obtiene el texto del campo de apellido materno
-            string AppellidoPaterno = txtApellidoPaterno.Text; // Obtiene el texto del campo de apellido paterno
-            string Curp = txtCurp.Text; // Obtiene el texto del campo de CURP
-
-            var datos = new datos(); // Crea una instancia de la clase datos
-            datos.PruebaConexcion(); // Llama al método para probar la conexión a la base de datos
-
-
 
         }
 
@@ -104,10 +95,18 @@ namespace Proyecto_Integrador
 
         private void guardarbtn_Click(object sender, EventArgs e)
         {
+            //Datos personales
             string nombres = txtNombres.Text;
             string apellidoMaterno = txtApellidoMeterno.Text;
             string apellidoPaterno = txtApellidoPaterno.Text;
             string curp = txtCurp.Text;
+
+            //Datos Medicos
+            string causa = txtCausa.Text;
+            int respuesta = rbtnSiExpediente.Checked ? 1 : 0;// verifica que si se seleciono Si
+            int respuesta2  = rbtnSIEstudiosClinicos.Checked ? 1 : 0;// verifica que si se seleciono Si
+            
+
             var datos = new datos(); // Crea una instancia de la clase datos
             Dictionary<string, object> datospersonales = new Dictionary<string, object>// Crea un diccionario para almacenar los datos personales
             {
@@ -117,14 +116,15 @@ namespace Proyecto_Integrador
                 { "apellido_paterno", apellidoPaterno }
             };
             int idInsertado = datos.Insertar("datos_personales", datospersonales); // Inserta los datos del medicamento en la base de datos
-            if (idInsertado > 0)
-            {
-                MessageBox.Show($"Medicamento registrado con éxito. ID: {idInsertado}");
-            }
-            else
-            {
-                MessageBox.Show("Error al registrar el medicamento.");
-            }
+
+
+
+
+        }
+
+        private void txtCantidad_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

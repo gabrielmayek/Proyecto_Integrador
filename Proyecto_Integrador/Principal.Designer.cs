@@ -40,9 +40,8 @@ namespace Proyecto_Integrador
             label2 = new Label();
             Registar = new TabPage();
             panel2 = new Panel();
+            guardarbtn = new Button();
             dataGridView1 = new DataGridView();
-            btnguardar = new Button();
-            textBox5 = new TextBox();
             cmbMedicamentos = new ComboBox();
             rbtnNOExpediente = new RadioButton();
             rbtnNOEstudiosClinicos = new RadioButton();
@@ -60,7 +59,6 @@ namespace Proyecto_Integrador
             txtAlergias = new TextBox();
             txtAdministracion = new TextBox();
             txtApellidoMeterno = new TextBox();
-            txtFecha = new TextBox();
             txtApellidoPaterno = new TextBox();
             label14 = new Label();
             label18 = new Label();
@@ -75,7 +73,7 @@ namespace Proyecto_Integrador
             tabControlMenu = new TabControl();
             Mensajebienvenida = new TabPage();
             label4 = new Label();
-            guardarbtn = new Button();
+            dtimeEntrada = new DateTimePicker();
             panel1.SuspendLayout();
             Historial.SuspendLayout();
             Activos.SuspendLayout();
@@ -202,10 +200,9 @@ namespace Proyecto_Integrador
             // 
             panel2.AutoScroll = true;
             panel2.BackColor = Color.FromArgb(129, 166, 100);
+            panel2.Controls.Add(dtimeEntrada);
             panel2.Controls.Add(guardarbtn);
             panel2.Controls.Add(dataGridView1);
-            panel2.Controls.Add(btnguardar);
-            panel2.Controls.Add(textBox5);
             panel2.Controls.Add(cmbMedicamentos);
             panel2.Controls.Add(rbtnNOExpediente);
             panel2.Controls.Add(rbtnNOEstudiosClinicos);
@@ -223,7 +220,6 @@ namespace Proyecto_Integrador
             panel2.Controls.Add(txtAlergias);
             panel2.Controls.Add(txtAdministracion);
             panel2.Controls.Add(txtApellidoMeterno);
-            panel2.Controls.Add(txtFecha);
             panel2.Controls.Add(txtApellidoPaterno);
             panel2.Controls.Add(label14);
             panel2.Controls.Add(label18);
@@ -240,6 +236,16 @@ namespace Proyecto_Integrador
             panel2.TabIndex = 1;
             panel2.Paint += panel2_Paint;
             // 
+            // guardarbtn
+            // 
+            guardarbtn.Location = new Point(703, 1203);
+            guardarbtn.Name = "guardarbtn";
+            guardarbtn.Size = new Size(167, 52);
+            guardarbtn.TabIndex = 7;
+            guardarbtn.Text = "button1";
+            guardarbtn.UseVisualStyleBackColor = true;
+            guardarbtn.Click += guardarbtn_Click;
+            // 
             // dataGridView1
             // 
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -248,29 +254,6 @@ namespace Proyecto_Integrador
             dataGridView1.RowHeadersWidth = 51;
             dataGridView1.Size = new Size(857, 188);
             dataGridView1.TabIndex = 6;
-            // 
-            // btnguardar
-            // 
-            btnguardar.BackColor = Color.FromArgb(177, 232, 134);
-            btnguardar.FlatAppearance.BorderColor = Color.FromArgb(128, 255, 128);
-            btnguardar.FlatAppearance.BorderSize = 2;
-            btnguardar.FlatStyle = FlatStyle.Popup;
-            btnguardar.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnguardar.Location = new Point(741, 1476);
-            btnguardar.Name = "btnguardar";
-            btnguardar.Size = new Size(214, 43);
-            btnguardar.TabIndex = 3;
-            btnguardar.Text = "Guardar";
-            btnguardar.UseVisualStyleBackColor = false;
-            btnguardar.Click += btnActivos_Click;
-            // 
-            // textBox5
-            // 
-            textBox5.Location = new Point(241, 1529);
-            textBox5.Multiline = true;
-            textBox5.Name = "textBox5";
-            textBox5.Size = new Size(30, 289);
-            textBox5.TabIndex = 5;
             // 
             // cmbMedicamentos
             // 
@@ -335,7 +318,7 @@ namespace Proyecto_Integrador
             label12.AutoSize = true;
             label12.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label12.ForeColor = Color.White;
-            label12.Location = new Point(41, 1189);
+            label12.Location = new Point(69, 1162);
             label12.Name = "label12";
             label12.Size = new Size(91, 28);
             label12.TabIndex = 1;
@@ -433,6 +416,7 @@ namespace Proyecto_Integrador
             txtCantidad.Name = "txtCantidad";
             txtCantidad.Size = new Size(176, 32);
             txtCantidad.TabIndex = 0;
+            txtCantidad.TextChanged += txtCantidad_TextChanged;
             // 
             // txtAlergias
             // 
@@ -441,6 +425,7 @@ namespace Proyecto_Integrador
             txtAlergias.Name = "txtAlergias";
             txtAlergias.Size = new Size(178, 32);
             txtAlergias.TabIndex = 0;
+            txtAlergias.TextChanged += txtAlergias_TextChanged;
             // 
             // txtAdministracion
             // 
@@ -449,6 +434,7 @@ namespace Proyecto_Integrador
             txtAdministracion.Name = "txtAdministracion";
             txtAdministracion.Size = new Size(299, 32);
             txtAdministracion.TabIndex = 0;
+            txtAdministracion.TextChanged += txtAdministracion_TextChanged;
             // 
             // txtApellidoMeterno
             // 
@@ -457,14 +443,7 @@ namespace Proyecto_Integrador
             txtApellidoMeterno.Name = "txtApellidoMeterno";
             txtApellidoMeterno.Size = new Size(290, 32);
             txtApellidoMeterno.TabIndex = 0;
-            // 
-            // txtFecha
-            // 
-            txtFecha.Font = new Font("Verdana", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            txtFecha.Location = new Point(640, 391);
-            txtFecha.Name = "txtFecha";
-            txtFecha.Size = new Size(297, 32);
-            txtFecha.TabIndex = 0;
+            txtApellidoMeterno.TextChanged += txtApellidoMeterno_TextChanged;
             // 
             // txtApellidoPaterno
             // 
@@ -473,6 +452,7 @@ namespace Proyecto_Integrador
             txtApellidoPaterno.Name = "txtApellidoPaterno";
             txtApellidoPaterno.Size = new Size(307, 32);
             txtApellidoPaterno.TabIndex = 0;
+            txtApellidoPaterno.TextChanged += txtApellidoPaterno_TextChanged;
             // 
             // label14
             // 
@@ -553,6 +533,7 @@ namespace Proyecto_Integrador
             txtCurp.Name = "txtCurp";
             txtCurp.Size = new Size(236, 32);
             txtCurp.TabIndex = 0;
+            txtCurp.TextChanged += txtCurp_TextChanged;
             // 
             // txtCausa
             // 
@@ -561,6 +542,7 @@ namespace Proyecto_Integrador
             txtCausa.Name = "txtCausa";
             txtCausa.Size = new Size(236, 32);
             txtCausa.TabIndex = 0;
+            txtCausa.TextChanged += txtCausa_TextChanged;
             // 
             // txtNombres
             // 
@@ -569,6 +551,7 @@ namespace Proyecto_Integrador
             txtNombres.Name = "txtNombres";
             txtNombres.Size = new Size(236, 32);
             txtNombres.TabIndex = 0;
+            txtNombres.TextChanged += txtNombres_TextChanged;
             // 
             // label1
             // 
@@ -589,6 +572,7 @@ namespace Proyecto_Integrador
             tabControlMenu.SelectedIndex = 0;
             tabControlMenu.Size = new Size(1002, 830);
             tabControlMenu.TabIndex = 1;
+            tabControlMenu.SelectedIndexChanged += tabControlMenu_SelectedIndexChanged;
             // 
             // Mensajebienvenida
             // 
@@ -612,21 +596,19 @@ namespace Proyecto_Integrador
             label4.TabIndex = 3;
             label4.Text = "Bienvenido";
             // 
-            // guardarbtn
+            // dtimeEntrada
             // 
-            guardarbtn.Location = new Point(703, 1203);
-            guardarbtn.Name = "guardarbtn";
-            guardarbtn.Size = new Size(167, 52);
-            guardarbtn.TabIndex = 7;
-            guardarbtn.Text = "button1";
-            guardarbtn.UseVisualStyleBackColor = true;
-            guardarbtn.Click += guardarbtn_Click;
+            dtimeEntrada.CalendarFont = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dtimeEntrada.Location = new Point(472, 383);
+            dtimeEntrada.Name = "dtimeEntrada";
+            dtimeEntrada.Size = new Size(475, 43);
+            dtimeEntrada.TabIndex = 8;
             // 
             // Principal
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1160, 657);
+            ClientSize = new Size(1160, 814);
             Controls.Add(tabControlMenu);
             Controls.Add(panel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -651,6 +633,51 @@ namespace Proyecto_Integrador
             Mensajebienvenida.ResumeLayout(false);
             Mensajebienvenida.PerformLayout();
             ResumeLayout(false);
+        }
+
+        private void tabControlMenu_SelectedIndexChanged(object sender, EventArgs e)
+        {
+                throw new NotImplementedException();
+        }
+
+        private void txtNombres_TextChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void txtCausa_TextChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void txtCurp_TextChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void txtApellidoPaterno_TextChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void txtFecha_TextChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void txtApellidoMeterno_TextChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void txtAdministracion_TextChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void txtAlergias_TextChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void tabPage1_Click(object sender, EventArgs e)
@@ -683,7 +710,6 @@ namespace Proyecto_Integrador
         private TextBox txtApellidoPaterno;
         private Label label12;
         private Label label10;
-        private TextBox txtFecha;
         private Label label13;
         private Label label9;
         private TextBox txtCurp;
@@ -695,7 +721,6 @@ namespace Proyecto_Integrador
         private RadioButton rbtnSiExpediente;
         private Label label14;
         private ComboBox cmbMedicamentos;
-        private TextBox textBox5;
         private Label label15;
         private TextBox txtAdministracion;
         private Label label17;
@@ -704,7 +729,7 @@ namespace Proyecto_Integrador
         private TextBox txtAlergias;
         private DataGridView dataGridView1;
         private Label label18;
-        private Button btnguardar;
         private Button guardarbtn;
+        private DateTimePicker dtimeEntrada;
     }
 }
