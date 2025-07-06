@@ -38,6 +38,7 @@
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label1.ForeColor = Color.Transparent;
             label1.Location = new Point(96, 27);
             label1.Name = "label1";
             label1.Size = new Size(191, 31);
@@ -48,6 +49,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label2.ForeColor = Color.Transparent;
             label2.Location = new Point(108, 71);
             label2.Name = "label2";
             label2.Size = new Size(152, 31);
@@ -66,6 +68,7 @@
             // 
             btnVerificar.BackColor = Color.FromArgb(177, 232, 134);
             btnVerificar.BackgroundImageLayout = ImageLayout.Center;
+            btnVerificar.FlatStyle = FlatStyle.Popup;
             btnVerificar.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
             btnVerificar.Location = new Point(108, 193);
             btnVerificar.Name = "btnVerificar";
