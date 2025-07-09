@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Proyecto_Integrador.models
+namespace Proyecto_Integrador.Models
 {
     internal class Medicamento
     {
@@ -14,7 +14,7 @@ namespace Proyecto_Integrador.models
 
         public override string ToString()
         {
-            return Nombre;
+            return Nombre?? "";
         }
     }
 }
