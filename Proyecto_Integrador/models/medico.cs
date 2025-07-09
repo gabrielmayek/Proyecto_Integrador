@@ -4,21 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Proyecto_Integrador.models
+namespace Proyecto_Integrador.Models
 {
-    public class Medico
+    internal class Medico
     {
         public int id_medico { get; set; }
         public int cedula { get; set; }
         public string? nombres { get; set; }
-        public string? apellido_paterno { get; set; }
         public string? apellido_materno { get; set; }
+        public string? apellido_paterno { get; set; }
 
 
-        public string nombreCompleto
+        public string Nombre_completo// Propiedad que devuelve el nombre completo del médico
         {
-           get 
-           { return $"{nombres} {apellido_paterno} {apellido_materno}"; }
+            get {return $"{nombres} {apellido_paterno} {apellido_materno}"; }
+  
         }
 
     }

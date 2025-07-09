@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
-using Proyecto_Integrador.models;
+using Proyecto_Integrador.Models;
 
 namespace Proyecto_Integrador.Data
 {
@@ -75,6 +75,8 @@ namespace Proyecto_Integrador.Data
                 {
                     conexion.Open();
                     return Convert.ToInt32(comando.ExecuteScalar());
+                    //ExecuteScalar es un método que ejecuta la consulta
+                    //y devuelve el primer valor de la primera fila del resultado
                     // Ejecutar la consulta y obtener el último ID insertado como un entero
                 }
                 catch (Exception ex)
@@ -94,7 +96,7 @@ namespace Proyecto_Integrador.Data
 
 
         }
-        public void CargarCombo(ComboBox comboBox)
+        public void CargarComboMedicamentos(ComboBox comboBox)
         {
             // Método para cargar un ComboBox con los nombres de los medicamentos desde la base de datos
             string query = "SELECT id_medicamentos,nombre_medicamento FROM medicamento";
@@ -111,7 +113,7 @@ namespace Proyecto_Integrador.Data
                     {
                         listaMedicamentos.Add(new Medicamento
                         {
-                            
+
                             Id = reader.GetInt32("id_medicamentos"),
                             //siempre se debe obtener el ID del medicamento para poder usarlo más tarde 
                             Nombre = reader.GetString("nombre_medicamento")
@@ -120,7 +122,7 @@ namespace Proyecto_Integrador.Data
                     }
                     listaMedicamentos.Insert(0, new Medicamento
                     {
-                        Id = 0,
+                        Id = 0,// Agregar un elemento al inicio de la lista con ID 0 y nombre "Seleccione un medicamento..."
                         Nombre = "selecione un medicamento..."
                     });
                     comboBox.DataSource = listaMedicamentos;// Asignar la lista de medicamentos como fuente de datos del ComboBox
@@ -133,12 +135,16 @@ namespace Proyecto_Integrador.Data
                 }
             }
         }
+     
 
         public void CargarComboMedicos(ComboBox comboBox)
         {
             // Método para cargar un ComboBox con los nombres de los médicos desde la base de datos
-            string query = "SELECT id_medico,cedula,nombres,apellido_paterno,apellido_materno FROM datos_del_medico";
+            string query = "SELECT * FROM datos_del_medico";
             List<Medico> listaMedicos = new List<Medico>();
+            // Lista para almacenar los médicos obtenidos de la base de datos
+            //Medico es una clase que representa a un médico con sus propiedades
+            //list es una colección genérica que almacena objetos de tipo Medico
             using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
             {
                 MySqlCommand command = new MySqlCommand(query, connection);
@@ -153,8 +159,9 @@ namespace Proyecto_Integrador.Data
                             id_medico = reader.GetInt32("id_medico"),
                             cedula = reader.GetInt32("cedula"), 
                             nombres = reader.GetString("nombres"),
+                            apellido_materno = reader.GetString("apellido_materno"),
                             apellido_paterno = reader.GetString("apellido_paterno"),
-                            apellido_materno = reader.GetString("apellido_materno")
+                     
                         });
                     }
                     listaMedicos.Insert(0, new Medico
@@ -162,8 +169,8 @@ namespace Proyecto_Integrador.Data
                         nombres = "selecione un medico..."
                     });
                     comboBox.DataSource = listaMedicos;// Asignar la lista de médicos como fuente de datos del ComboBox
-                    comboBox.DisplayMember = "nombreCompleto"; // Lo que se muestra
-                    comboBox.ValueMember = "id_medico"; // El valor asociado
+                    comboBox.DisplayMember = "Nombre_completo"; // Lo que se muestra donde se utiliza la propiedad nombreCompleto de la clase Medico
+                    comboBox.ValueMember = "id_medico"; // El valor asociado donde se utiliza la propiedad id_medico de la clase Medico
                 }
                 catch (Exception ex)
                 {
