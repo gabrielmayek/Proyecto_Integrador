@@ -8,8 +8,8 @@ namespace Proyecto_Integrador.Models
 {
     internal class Medico
     {
-        public int id_medico { get; set; }
-        public int cedula { get; set; }
+        public int? id_medico { get; set; }
+        public int? cedula { get; set; }
         public string? nombres { get; set; }
         public string? apellido_materno { get; set; }
         public string? apellido_paterno { get; set; }
