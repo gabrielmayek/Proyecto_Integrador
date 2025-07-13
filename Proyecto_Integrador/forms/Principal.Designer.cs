@@ -38,9 +38,13 @@ namespace Proyecto_Integrador
             Historial = new TabPage();
             label3 = new Label();
             Activos = new TabPage();
-            label2 = new Label();
+            flowLayoutPanel1 = new FlowLayoutPanel();
             Registar = new TabPage();
             panel2 = new Panel();
+            label2 = new Label();
+            cmbTipo = new ComboBox();
+            cmbCausa = new ComboBox();
+            btnEliminar = new Button();
             btnAgregar = new Button();
             cmbMedico = new ComboBox();
             guardarbtn = new Button();
@@ -68,7 +72,6 @@ namespace Proyecto_Integrador
             label9 = new Label();
             label5 = new Label();
             txtCurp = new TextBox();
-            txtCausa = new TextBox();
             txtNombres = new TextBox();
             label1 = new Label();
             tabControlMenu = new TabControl();
@@ -168,7 +171,7 @@ namespace Proyecto_Integrador
             // Activos
             // 
             Activos.BackColor = Color.FromArgb(129, 166, 100);
-            Activos.Controls.Add(label2);
+            Activos.Controls.Add(flowLayoutPanel1);
             Activos.Font = new Font("Segoe UI", 16.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Activos.Location = new Point(4, 29);
             Activos.Name = "Activos";
@@ -177,14 +180,12 @@ namespace Proyecto_Integrador
             Activos.TabIndex = 1;
             Activos.Text = "Activos";
             // 
-            // label2
+            // flowLayoutPanel1
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(316, 136);
-            label2.Name = "label2";
-            label2.Size = new Size(265, 38);
-            label2.TabIndex = 0;
-            label2.Text = "Apartado de Activos";
+            flowLayoutPanel1.Location = new Point(0, 15);
+            flowLayoutPanel1.Name = "flowLayoutPanel1";
+            flowLayoutPanel1.Size = new Size(994, 662);
+            flowLayoutPanel1.TabIndex = 0;
             // 
             // Registar
             // 
@@ -204,6 +205,10 @@ namespace Proyecto_Integrador
             panel2.Anchor = AnchorStyles.Top;
             panel2.AutoScroll = true;
             panel2.BackColor = Color.FromArgb(129, 166, 100);
+            panel2.Controls.Add(label2);
+            panel2.Controls.Add(cmbTipo);
+            panel2.Controls.Add(cmbCausa);
+            panel2.Controls.Add(btnEliminar);
             panel2.Controls.Add(btnAgregar);
             panel2.Controls.Add(cmbMedico);
             panel2.Controls.Add(guardarbtn);
@@ -231,7 +236,6 @@ namespace Proyecto_Integrador
             panel2.Controls.Add(label9);
             panel2.Controls.Add(label5);
             panel2.Controls.Add(txtCurp);
-            panel2.Controls.Add(txtCausa);
             panel2.Controls.Add(txtNombres);
             panel2.Location = new Point(0, 0);
             panel2.Name = "panel2";
@@ -239,11 +243,53 @@ namespace Proyecto_Integrador
             panel2.TabIndex = 1;
             panel2.Paint += panel2_Paint;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label2.ForeColor = Color.White;
+            label2.Location = new Point(277, 836);
+            label2.Name = "label2";
+            label2.Size = new Size(60, 28);
+            label2.TabIndex = 15;
+            label2.Text = "Tipo";
+            // 
+            // cmbTipo
+            // 
+            cmbTipo.Font = new Font("Verdana", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            cmbTipo.FormattingEnabled = true;
+            cmbTipo.Location = new Point(157, 836);
+            cmbTipo.Name = "cmbTipo";
+            cmbTipo.Size = new Size(114, 33);
+            cmbTipo.TabIndex = 14;
+            // 
+            // cmbCausa
+            // 
+            cmbCausa.Font = new Font("Verdana", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            cmbCausa.FormattingEnabled = true;
+            cmbCausa.Location = new Point(29, 383);
+            cmbCausa.Name = "cmbCausa";
+            cmbCausa.Size = new Size(534, 33);
+            cmbCausa.TabIndex = 13;
+            cmbCausa.SelectedIndexChanged += cmbCausa_SelectedIndexChanged;
+            // 
+            // btnEliminar
+            // 
+            btnEliminar.BackColor = Color.FromArgb(177, 232, 134);
+            btnEliminar.FlatStyle = FlatStyle.Popup;
+            btnEliminar.Location = new Point(472, 1224);
+            btnEliminar.Name = "btnEliminar";
+            btnEliminar.Size = new Size(213, 46);
+            btnEliminar.TabIndex = 12;
+            btnEliminar.Text = "Eliminar";
+            btnEliminar.UseVisualStyleBackColor = false;
+            btnEliminar.Click += btnEliminar_Click;
+            // 
             // btnAgregar
             // 
             btnAgregar.BackColor = Color.FromArgb(177, 232, 134);
             btnAgregar.FlatStyle = FlatStyle.Flat;
-            btnAgregar.Location = new Point(680, 1137);
+            btnAgregar.Location = new Point(723, 1224);
             btnAgregar.Name = "btnAgregar";
             btnAgregar.Size = new Size(218, 46);
             btnAgregar.TabIndex = 11;
@@ -255,7 +301,7 @@ namespace Proyecto_Integrador
             // 
             cmbMedico.Font = new Font("Verdana", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             cmbMedico.FormattingEnabled = true;
-            cmbMedico.Location = new Point(41, 1251);
+            cmbMedico.Location = new Point(32, 1339);
             cmbMedico.Name = "cmbMedico";
             cmbMedico.Size = new Size(487, 33);
             cmbMedico.TabIndex = 10;
@@ -266,7 +312,7 @@ namespace Proyecto_Integrador
             guardarbtn.BackColor = Color.FromArgb(177, 232, 134);
             guardarbtn.FlatStyle = FlatStyle.Flat;
             guardarbtn.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            guardarbtn.Location = new Point(680, 1251);
+            guardarbtn.Location = new Point(723, 1339);
             guardarbtn.Name = "guardarbtn";
             guardarbtn.Size = new Size(218, 52);
             guardarbtn.TabIndex = 7;
@@ -291,13 +337,11 @@ namespace Proyecto_Integrador
             dgvDatos.Location = new Point(41, 895);
             dgvDatos.Name = "dgvDatos";
             dgvDatos.RowHeadersWidth = 51;
-            dgvDatos.Size = new Size(900, 200);
+            dgvDatos.Size = new Size(900, 300);
             dgvDatos.TabIndex = 6;
-
             dgvDatos.CellValueChanged += DgvDatos_CellValueChanged;
             dgvDatos.RowsAdded += DgvDatos_RowsChanged;
             dgvDatos.RowsRemoved += DgvDatos_RowsChanged;
-
             // 
             // cmbMedicamentos
             // 
@@ -307,13 +351,12 @@ namespace Proyecto_Integrador
             cmbMedicamentos.Name = "cmbMedicamentos";
             cmbMedicamentos.Size = new Size(565, 33);
             cmbMedicamentos.TabIndex = 4;
-    
             // 
             // rbtnNOEstudiosClinicos
             // 
             rbtnNOEstudiosClinicos.AutoSize = true;
             rbtnNOEstudiosClinicos.ForeColor = Color.Transparent;
-            rbtnNOEstudiosClinicos.Location = new Point(342, 413);
+            rbtnNOEstudiosClinicos.Location = new Point(30, 545);
             rbtnNOEstudiosClinicos.Name = "rbtnNOEstudiosClinicos";
             rbtnNOEstudiosClinicos.Size = new Size(75, 42);
             rbtnNOEstudiosClinicos.TabIndex = 3;
@@ -325,7 +368,7 @@ namespace Proyecto_Integrador
             // 
             rbtnSIEstudiosClinicos.AutoSize = true;
             rbtnSIEstudiosClinicos.ForeColor = Color.White;
-            rbtnSIEstudiosClinicos.Location = new Point(342, 365);
+            rbtnSIEstudiosClinicos.Location = new Point(30, 497);
             rbtnSIEstudiosClinicos.Name = "rbtnSIEstudiosClinicos";
             rbtnSIEstudiosClinicos.Size = new Size(60, 42);
             rbtnSIEstudiosClinicos.TabIndex = 3;
@@ -338,7 +381,7 @@ namespace Proyecto_Integrador
             label12.AutoSize = true;
             label12.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label12.ForeColor = Color.White;
-            label12.Location = new Point(41, 1205);
+            label12.Location = new Point(41, 1312);
             label12.Name = "label12";
             label12.Size = new Size(91, 28);
             label12.TabIndex = 1;
@@ -436,10 +479,9 @@ namespace Proyecto_Integrador
             txtCantidad.Name = "txtCantidad";
             txtCantidad.Size = new Size(100, 32);
             txtCantidad.TabIndex = 0;
-        
+            txtCantidad.TextChanged += txtCantidad_TextChanged;
             txtCantidad.KeyPress += txtCantidad_KeyPress;
             txtCantidad.Validating += txtCantidad_Validating;
-            txtCantidad.TextChanged += txtCantidad_TextChanged;
             // 
             // txtEfectoSecundario
             // 
@@ -448,10 +490,9 @@ namespace Proyecto_Integrador
             txtEfectoSecundario.Name = "txtEfectoSecundario";
             txtEfectoSecundario.Size = new Size(250, 32);
             txtEfectoSecundario.TabIndex = 0;
-         
+            txtEfectoSecundario.TextChanged += txtEfectoSecundario_TextChanged;
             txtEfectoSecundario.KeyPress += txtEfectoSecundario_KeyPress;
             txtEfectoSecundario.Validating += txtEfectoSecundario_Validating;
-            txtEfectoSecundario.TextChanged += txtEfectoSecundario_TextChanged;
             // 
             // txtAdministracion
             // 
@@ -460,7 +501,6 @@ namespace Proyecto_Integrador
             txtAdministracion.Name = "txtAdministracion";
             txtAdministracion.Size = new Size(100, 32);
             txtAdministracion.TabIndex = 0;
-  
             txtAdministracion.KeyPress += txtAdministracion_KeyPress;
             txtAdministracion.Validating += txtAdministracion_Validating;
             // 
@@ -471,10 +511,9 @@ namespace Proyecto_Integrador
             txtApellidoMeterno.Name = "txtApellidoMeterno";
             txtApellidoMeterno.Size = new Size(200, 32);
             txtApellidoMeterno.TabIndex = 0;
-     
-            txtApellidoMeterno.KeyPress += txtApellidoMeterno_KeyPress;
-            txtApellidoMeterno.Validating += txtApellidoMaterno_Validating; 
             txtApellidoMeterno.TextChanged += txtApellidoMaterno_TextChanged;
+            txtApellidoMeterno.KeyPress += txtApellidoMeterno_KeyPress;
+            txtApellidoMeterno.Validating += txtApellidoMaterno_Validating;
             // 
             // txtApellidoPaterno
             // 
@@ -483,10 +522,9 @@ namespace Proyecto_Integrador
             txtApellidoPaterno.Name = "txtApellidoPaterno";
             txtApellidoPaterno.Size = new Size(200, 32);
             txtApellidoPaterno.TabIndex = 0;
-      
+            txtApellidoPaterno.TextChanged += txtApellidoPaterno_TextChanged;
             txtApellidoPaterno.KeyPress += txtApellidoPaterno_KeyPress;
             txtApellidoPaterno.Validating += txtApellidoPaterno_Validating;
-            txtApellidoPaterno.TextChanged += txtApellidoPaterno_TextChanged;
             // 
             // label18
             // 
@@ -517,7 +555,7 @@ namespace Proyecto_Integrador
             label11.AutoSize = true;
             label11.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label11.ForeColor = Color.White;
-            label11.Location = new Point(319, 334);
+            label11.Location = new Point(29, 466);
             label11.Name = "label11";
             label11.Size = new Size(204, 28);
             label11.TabIndex = 1;
@@ -556,22 +594,8 @@ namespace Proyecto_Integrador
             txtCurp.Name = "txtCurp";
             txtCurp.Size = new Size(270, 32);
             txtCurp.TabIndex = 0;
-            txtCurp.Validating += txtCurp_Validating;
             txtCurp.TextChanged += txtCurp_TextChanged;
-    
-
-            // 
-            // txtCausa
-            // 
-            txtCausa.Font = new Font("Verdana", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            txtCausa.Location = new Point(26, 365);
-            txtCausa.Name = "txtCausa";
-            txtCausa.Size = new Size(240, 32);
-            txtCausa.TabIndex = 0;
- 
-            txtCausa.KeyPress += txtCausa_KeyPress;
-            txtCausa.Validating += txtCausa_Validating;
-            txtCausa.TextChanged += txtCausa_TextChanged;
+            txtCurp.Validating += txtCurp_Validating;
             // 
             // txtNombres
             // 
@@ -580,10 +604,9 @@ namespace Proyecto_Integrador
             txtNombres.Name = "txtNombres";
             txtNombres.Size = new Size(250, 32);
             txtNombres.TabIndex = 0;
-
+            txtNombres.TextChanged += txtNombres_TextChanged;
             txtNombres.KeyPress += txtNombres_KeyPress;
             txtNombres.Validating += txtNombres_Validating;
-            txtNombres.TextChanged += txtNombres_TextChanged;
             // 
             // label1
             // 
@@ -646,6 +669,7 @@ namespace Proyecto_Integrador
             Padding = new Padding(50, 50, 20, 30);
             ShowIcon = false;
             ShowInTaskbar = false;
+            SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Control del cuidado del paciente";
             Load += Form1_Load;
@@ -653,7 +677,6 @@ namespace Proyecto_Integrador
             Historial.ResumeLayout(false);
             Historial.PerformLayout();
             Activos.ResumeLayout(false);
-            Activos.PerformLayout();
             Registar.ResumeLayout(false);
             Registar.PerformLayout();
             panel2.ResumeLayout(false);
@@ -675,7 +698,6 @@ namespace Proyecto_Integrador
 
         private void tabPage1_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         #endregion
@@ -687,7 +709,6 @@ namespace Proyecto_Integrador
         private TabPage Historial;
         private Label label3;
         private TabPage Activos;
-        private Label label2;
         private TabPage Registar;
         private Label label1;
         private TabControl tabControlMenu;
@@ -706,7 +727,6 @@ namespace Proyecto_Integrador
         private Label label13;
         private Label label9;
         private TextBox txtCurp;
-        private TextBox txtCausa;
         private RadioButton rbtnNOEstudiosClinicos;
         private RadioButton rbtnSIEstudiosClinicos;
         private Label label11;
@@ -724,5 +744,10 @@ namespace Proyecto_Integrador
         private ComboBox cmbMedico;
         private Button btnAgregar;
         private ErrorProvider errorProvider1;
+        private FlowLayoutPanel flowLayoutPanel1;
+        private Button btnEliminar;
+        private ComboBox cmbCausa;
+        private Label label2;
+        private ComboBox cmbTipo;
     }
 }

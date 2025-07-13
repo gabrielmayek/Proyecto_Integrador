@@ -63,6 +63,7 @@
             txtVerificacion.Name = "txtVerificacion";
             txtVerificacion.Size = new Size(320, 38);
             txtVerificacion.TabIndex = 1;
+            txtVerificacion.TextChanged += txtVerificacion_TextChanged;
             // 
             // btnVerificar
             // 
@@ -74,8 +75,9 @@
             btnVerificar.Name = "btnVerificar";
             btnVerificar.Size = new Size(165, 43);
             btnVerificar.TabIndex = 2;
-            btnVerificar.Text = "button1";
+            btnVerificar.Text = "Verificar";
             btnVerificar.UseVisualStyleBackColor = false;
+            btnVerificar.Click += btnVerificar_Click;
             // 
             // Verificacion
             // 
@@ -88,7 +90,7 @@
             Controls.Add(label2);
             Controls.Add(label1);
             Name = "Verificacion";
-            Text = "Verificaion";
+            Text = "w";
             Load += Verificaion_Load;
             ResumeLayout(false);
             PerformLayout();
