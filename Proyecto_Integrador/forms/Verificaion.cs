@@ -20,6 +20,11 @@ namespace Proyecto_Integrador
         {
             InitializeComponent();
             ContenidoPrincipal = principal;
+            this.FormBorderStyle = FormBorderStyle.FixedSingle; // Evita que se pueda cambiar el tamaño
+            this.MaximizeBox = false; // Desactiva el botón de maximizar
+            this.MinimizeBox = false; // Desactiva el botón de minimizar
+            ContenidoPrincipal.panel.Enabled = false; // Desactiva el panel principal
+
         }
 
         private void Verificaion_Load(object sender, EventArgs e)
@@ -34,35 +39,47 @@ namespace Proyecto_Integrador
 
         private void btnVerificar_Click(object sender, EventArgs e)
         {
-
             string verificacion = txtVerificacion.Text;
             var clase = new Datos();
-            var datoP = clase.ObtenerDatosPaciente(verificacion);
-            var datosE = clase.OBtenerEstancias(datoP.id_Paciente);
-            var datosT = clase.ObtenerTratamiento(datosE.Id);
-            var datosGrind = clase.ObtenertratamientoConMedicamentos(datosT.id_tratamiento);
 
-            ContenidoPrincipal.txtnombres.Text = datoP.Nombres;
-            ContenidoPrincipal.txtcurp.Text = datoP.Curp;
-            ContenidoPrincipal.txtapellido_paterno.Text = datoP.Apellido_Paterno;
-            ContenidoPrincipal.apellido_materno.Text = datoP.Apellido_Materno;
-            if (datosT.estudio_clinico == 1)
+
+            var datoP = clase.ObtenerDatosPaciente(verificacion);
+            if (datoP == null)
             {
-                ContenidoPrincipal.radioButton.Checked = true;
+                MessageBox.Show("No se encontró ningún registro con esa CURP.");
+                ContenidoPrincipal.panel.Enabled = true; // Reactiva el panel principal
+                this.Close();
             }
             else
             {
-                ContenidoPrincipal.radioButton.Checked = false;
+                var datosE = clase.OBtenerEstancias(datoP.id_Paciente);
+                var datosT = clase.ObtenerTratamiento(datosE.Id);
+                var datosGrind = clase.ObtenertratamientoConMedicamentos(datosT.id_tratamiento);
+
+                ContenidoPrincipal.txtnombres.Text = datoP.Nombres;
+                ContenidoPrincipal.txtcurp.Text = datoP.Curp;
+                ContenidoPrincipal.txtapellido_paterno.Text = datoP.Apellido_Paterno;
+                ContenidoPrincipal.apellido_materno.Text = datoP.Apellido_Materno;
+                if (datosT.estudio_clinico == 1)
+                {
+                    ContenidoPrincipal.radioButton.Checked = true;
+                }
+                else
+                {
+                    ContenidoPrincipal.radioButton.Checked = false;
+                }
+
+                foreach (var item in datosGrind)
+                {
+
+                    ContenidoPrincipal.dgvdatos.Rows.Add(item.id_medicaemto, item.Medicamento, item.tiempoAdministracion, item.cantidad, item.Efecto_secundario);
+                }
+
+                ContenidoPrincipal.guardar.Hide();
+                ContenidoPrincipal.Actualiar.Show();
+                ContenidoPrincipal.panel.Enabled = true; // Reactiva el panel principal
+                this.Close();
             }
-
-            foreach (var item in datosGrind)
-            {
-
-                ContenidoPrincipal.dgvdatos.Rows.Add(item.id_medicaemto, item.Medicamento, item.tiempoAdministracion, item.cantidad, item.Efecto_secundario);
-            }
-
-
-
 
 
         }
@@ -72,10 +89,33 @@ namespace Proyecto_Integrador
             int longitud = txtVerificacion.Text.Length;
             if (longitud > 18)
             {
-                MessageBox.Show("La CURP no puede tener más de 18 caracteres.");
-
+                MessageBox.Show("La CURP no puede estar vacia y debe tener más de 18 caracteres.");
                 txtVerificacion.Text = txtVerificacion.Text.Substring(0, 18); // Limita la CURP a 18 caracteres
             }
+
         }
+
+        private void txtVerificacion_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsLetterOrDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true; // Cancela la entrada del carácter
+            }
+        }
+
+
+
+        // Esto desactiva el botón de cerrar (X)
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                const int CS_NOCLOSE = 0x200;
+                CreateParams cp = base.CreateParams;
+                cp.ClassStyle |= CS_NOCLOSE;
+                return cp;
+            }
+        }
+
     }
 }

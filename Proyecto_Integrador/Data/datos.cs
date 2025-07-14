@@ -1,4 +1,7 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using Mysqlx.Prepare;
+using Proyecto_Integrador.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -6,14 +9,14 @@ using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
-using Mysqlx.Prepare;
-using Proyecto_Integrador.Models;
+using System.Threading.Tasks.Dataflow;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Proyecto_Integrador.Data
 {
     internal class Datos
     {
+        //APARTADO REGISTRAR GABRIEL EDUARDO MAY EK
         private string CadenaConexion = "Server=localhost;User=root;Password=admin;Port=3306;database=Proyecto_integrador";
         // Cambia la cadena de conexión según tu configuración
         // Método para insertar datos en una tabla específica de la base de datos
@@ -75,17 +78,49 @@ namespace Proyecto_Integrador.Data
                     return -1;
                 }
             }
-
-
-
-
-
-
-
-
-
-
         }
+
+        public void ActualizarTablas(string tabla, Dictionary<string, object> datos, string condicion, int id_necesario)
+        {
+            if (datos == null || datos.Count == 0)
+            {
+                Console.WriteLine("No se proporcionaron datos para actualizar.");
+                return;
+            }
+
+            var lista = new List<string>();
+            foreach (var dato in datos)
+            {
+                lista.Add($"{dato.Key} = @{dato.Key}");
+            }
+            string columnas = string.Join(", ", lista);
+            string consulta = $"UPDATE {tabla} SET {columnas} WHERE {condicion} = @{condicion}";
+
+            using (MySqlConnection conexion = new MySqlConnection(CadenaConexion))
+            {
+                MySqlCommand comando = new MySqlCommand(consulta, conexion);
+
+                foreach (var dato in datos)
+                {
+                    comando.Parameters.AddWithValue("@" + dato.Key, dato.Value);
+                }
+
+                comando.Parameters.AddWithValue("@" + condicion, id_necesario);
+
+                try
+                {
+                    conexion.Open();
+                    comando.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al actualizar {ex.Message}");
+                }
+            }
+        }
+
+
+
         public void CargarComboMedicamentos(ComboBox comboBox)
         {
             // Método para cargar un ComboBox con los nombres de los medicamentos desde la base de datos
@@ -204,53 +239,58 @@ namespace Proyecto_Integrador.Data
         
         }
 
-        public int[] ObtenerId()
-        {
-            string query = "SELECT * FROM datos_personales where estado_actual = 1";
-            List<int> tablas = new List<int>();
-            using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
-            {
-                MySqlCommand commandos = new MySqlCommand(query, connection);
-                try
-                {
-                    connection.Open();
-                    MySqlDataReader reader = commandos.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        tablas.Add(reader.GetInt32("id_paciente"));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error al conectar", ex.Message);
-                }
-                return tablas.ToArray();
-            }
-        }
 
-        public int EstadoActual()//determina el número de pacientes activos
+        public int id_inactivo(string curp)//
         {
-            int total = 0;
-            string query = "select count(*) from datos_personales where estado_actual = 1";
+            int id_obtenido = 0;
+            string query = $"select id_Paciente from paciente where estado_actual = 0 and curp='{curp}'";
             using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
             {
                 MySqlCommand commandos = new MySqlCommand(query, connection);
                 try
                 {
                     connection.Open();
-                    total = Convert.ToInt32(commandos.ExecuteScalar());
+                    id_obtenido = Convert.ToInt32(commandos.ExecuteScalar());
                     // ExecuteScalar es un método que ejecuta la consulta y devuelve el primer valor de la primera fila del resultado
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error al conectar", ex.Message);
+                    MessageBox.Show("Error al conectar 1", ex.Message);
                     return -1;
                 }
-                return Convert.ToInt32(total);
+                return Convert.ToInt32(id_obtenido);
             }
-
         }
-    
+
+        public string curp_inactivo(int id)//
+        {
+            string curp="";
+            string query = $"select curp from paciente where estado_actual = 0 and id_paciente={id}";
+            using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
+            {
+                MySqlCommand commandos = new MySqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    object obtenerCurp = commandos.ExecuteScalar();
+                    if (obtenerCurp != null)
+                    {
+                        curp = obtenerCurp.ToString();
+                        // ExecuteScalar es un método que ejecuta la consulta y devuelve el primer valor de la primera fila del resultado
+                    }
+                    else
+                    {
+                       curp = "curp no encontrada";
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al conectar 2", ex.Message);
+                }
+                return curp ;
+            }
+        }
 
 
 
@@ -266,22 +306,29 @@ namespace Proyecto_Integrador.Data
 
                 using (var command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@curp", curp);
-
-                    using (var reader = command.ExecuteReader())
+                    try
                     {
-                        if (reader.Read())
+                        command.Parameters.AddWithValue("@curp", curp);
+
+                        using (var reader = command.ExecuteReader())
                         {
-                            datos = new Paciente
+                            if (reader.Read())
                             {
-                                id_Paciente= reader.GetInt32("id_paciente"),
-                                Nombres = reader.GetString("nombres"),
-                                Curp = reader.GetString("curp"),
-                                Apellido_Paterno = reader.GetString("apellido_Paterno"),
-                                Apellido_Materno = reader.GetString("apellido_materno"),
-                                estado_actual = reader.GetInt32("estado_actual")
-                            };
+                                datos = new Paciente
+                                {
+                                    id_Paciente = reader.GetInt32("id_paciente"),
+                                    Nombres = reader.GetString("nombres"),
+                                    Curp = reader.GetString("curp"),
+                                    Apellido_Paterno = reader.GetString("apellido_Paterno"),
+                                    Apellido_Materno = reader.GetString("apellido_materno"),
+                                    estado_actual = reader.GetInt32("estado_actual")
+                                };
+                            }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error al conectar 3", ex.Message);
                     }
                 }
             }
@@ -298,15 +345,22 @@ namespace Proyecto_Integrador.Data
                 string query = $"select * from estancias where id_paciente={id}";
                 using(var command = new MySqlCommand(query,connection))
                 {
-                    using(var reader = command.ExecuteReader())
+                    try
                     {
-                        if (reader.Read())
+                        using (var reader = command.ExecuteReader())
                         {
-                            estancias = new Estancias
+                            if (reader.Read())
                             {
-                               Id = reader.GetInt32("id_estadia"),
-                            };
+                                estancias = new Estancias
+                                {
+                                    Id = reader.GetInt32("id_estadia"),
+                                };
+                            }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error al conectar 4",ex.Message);
                     }
                 }
             }
@@ -316,8 +370,6 @@ namespace Proyecto_Integrador.Data
         }
 
 
-
-
         public Tratamiento ObtenerTratamiento(int id)
         {
             Tratamiento datos = null;
@@ -325,22 +377,29 @@ namespace Proyecto_Integrador.Data
             using (var connection = new MySqlConnection(CadenaConexion))
             {
                 connection.Open();
-                string query = $"SELECT * FROM tratamiento WHERE id_estancia ={id} ";
-                using (var command = new MySqlCommand(query, connection))
+                try
                 {
-                    command.Parameters.AddWithValue("@id", id);
-                    using (var reader = command.ExecuteReader())
+                    string query = $"SELECT * FROM tratamiento WHERE id_estancia ={id} ";
+                    using (var command = new MySqlCommand(query, connection))
                     {
-                        if (reader.Read())
+                        command.Parameters.AddWithValue("@id", id);
+                        using (var reader = command.ExecuteReader())
                         {
-                            datos = new Tratamiento
+                            if (reader.Read())
                             {
-                                id_tratamiento = reader.GetInt32("id_tratamiento"),
-                                estudio_clinico = reader.GetInt32("estudio_clinico")
+                                datos = new Tratamiento
+                                {
+                                    id_tratamiento = reader.GetInt32("id_tratamiento"),
+                                    estudio_clinico = reader.GetInt32("estudio_clinico")
 
-                            };
+                                };
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al obtener el tratamiento: " + ex.Message);
                 }
             }
 
@@ -401,7 +460,7 @@ namespace Proyecto_Integrador.Data
             }
         }
 
-
+    //APARTADO HISTORIAL
 
 
 

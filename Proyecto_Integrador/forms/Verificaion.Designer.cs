@@ -58,12 +58,14 @@
             // 
             // txtVerificacion
             // 
+            txtVerificacion.CharacterCasing = CharacterCasing.Upper;
             txtVerificacion.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
             txtVerificacion.Location = new Point(37, 105);
             txtVerificacion.Name = "txtVerificacion";
             txtVerificacion.Size = new Size(320, 38);
             txtVerificacion.TabIndex = 1;
             txtVerificacion.TextChanged += txtVerificacion_TextChanged;
+            txtVerificacion.KeyPress += txtVerificacion_KeyPress;
             // 
             // btnVerificar
             // 
