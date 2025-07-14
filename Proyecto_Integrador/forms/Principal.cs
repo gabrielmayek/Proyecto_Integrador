@@ -4,21 +4,25 @@ using Proyecto_Integrador.Models;
 using System.Reflection.Metadata;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 namespace Proyecto_Integrador
 {
     public partial class Principal : Form
     {
 
-        
+
         public System.Windows.Forms.TextBox txtnombres => txtNombres;
         public System.Windows.Forms.TextBox txtcurp => txtCurp;
         public System.Windows.Forms.TextBox txtapellido_paterno => txtApellidoPaterno;
         public System.Windows.Forms.TextBox apellido_materno => txtApellidoMeterno;
-       
+
         public System.Windows.Forms.RadioButton radioButton => rbtnSIEstudiosClinicos;
         public System.Windows.Forms.DataGridView dgvdatos => dgvDatos;
         public System.Windows.Forms.ComboBox datos_del_medico => cmbMedico;
+        public System.Windows.Forms.Button guardar => guardarbtn;
+        public System.Windows.Forms.Button Actualiar => btnActualizar;
+        public System.Windows.Forms.Panel panel => panelRegistrar;
 
 
         public Principal()
@@ -31,15 +35,16 @@ namespace Proyecto_Integrador
             datos.CargarComboCausas(cmbCausa);
             cmbMedicamentos.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             cmbMedicamentos.AutoCompleteSource = AutoCompleteSource.ListItems;
-            cmbCausa.AutoCompleteMode= AutoCompleteMode.SuggestAppend;
-            cmbCausa.AutoCompleteSource= AutoCompleteSource.ListItems;
+            cmbCausa.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cmbCausa.AutoCompleteSource = AutoCompleteSource.ListItems;
             cmbMedicamentos.Text = "Selecciona un medicamento"; // Establece el texto predeterminado del ComboBox
             cmbMedicamentos.Font = new Font("Verdana", 14);
             dtimeEntrada.Font = new Font("Verdana", 12);
             guardarbtn.Enabled = false;
+            btnActualizar.Enabled = false;
             List<string> tipos = new List<string> { "mL", "L", "µL", "cc", "gota", "cdita", "cda", "mg", "g", "kg", "mcg", "ng", "UI", "U", "mEq", "mol", "mmol", "UFC" };
-            cmbTipo.DataSource= tipos;
-          
+            cmbTipo.DataSource = tipos;
+
         }
 
 
@@ -113,28 +118,24 @@ namespace Proyecto_Integrador
         private void guardarbtn_Click(object sender, EventArgs e)
         {
 
-
             // Crea una instancia de la clase datos
             var datos = new Datos();
             // Obtiene el médico seleccionado del ComboBox
             Medico medico = (Medico)cmbMedico.SelectedItem;
-            Causas causa= (Causas)cmbCausa.SelectedItem;
-
+            Causas causa = (Causas)cmbCausa.SelectedItem;
             //Datos personales del paciente
             string nombres = txtNombres.Text;
             string apellidoMaterno = txtApellidoMeterno.Text;
             string apellidoPaterno = txtApellidoPaterno.Text;
             string curp = txtCurp.Text;
-
             //Datos Medicos del paciente
-        
-
             int respuesta2 = rbtnSIEstudiosClinicos.Checked ? 1 : 0;// verifica que si se seleciono Si
             DateTime fechaEntrada = dtimeEntrada.Value;
             DateTime fechaDefecto = new DateTime(2025, 7, 10, 9, 30, 0); // Año, mes, día, hora, minuto, segundo
             //tratamiento del paciente
             string efectos = txtEfectoSecundario.Text;
             //Medico que atiende al paciente
+
             Dictionary<string, object> paciente = new Dictionary<string, object>// Crea un diccionario para almacenar los datos personales
             {
                 { "curp", curp },
@@ -151,10 +152,10 @@ namespace Proyecto_Integrador
               {"fecha_entrada",fechaEntrada},
               {"fecha_salida", fechaDefecto}
             };
-          int id_estancia =  datos.Insertar("estancias", estancia);
+            int id_estancia = datos.Insertar("estancias", estancia);
 
             // Inserta los datos del medicamentoElegido en la base de datos
-            Dictionary<string, Object> tratamiento = new Dictionary<string, object>
+            Dictionary<string, object> tratamiento = new Dictionary<string, object>
             {
                 {"id_estancia",id_estancia },
                 {"id_medico",medico.id_medico },
@@ -197,7 +198,95 @@ namespace Proyecto_Integrador
 
         }
 
+        private void btnActualizar_Click(object sender, EventArgs e)
+        {
 
+            // Obtiene el médico seleccionado del ComboBox
+            Medico medico = (Medico)cmbMedico.SelectedItem;
+            Causas causa = (Causas)cmbCausa.SelectedItem;
+            //Datos Medicos del paciente
+            int respuesta2 = rbtnSIEstudiosClinicos.Checked ? 1 : 0;// verifica que si se seleciono Si
+            DateTime fechaEntrada = dtimeEntrada.Value;
+            DateTime fechaDefecto = new DateTime(2025, 7, 10, 9, 30, 0); // Año, mes, día, hora, minuto, segundo
+            //tratamiento del paciente
+            string efectos = txtEfectoSecundario.Text;
+            var dato = new Datos();
+            string curp = txtCurp.Text;
+            string nombres = txtNombres.Text;
+            string apellidoMaterno = txtApellidoMeterno.Text;
+            string apellidoPaterno = txtApellidoPaterno.Text;
+            int id_inactivo = dato.id_inactivo(curp);
+            string curp_inactivo = dato.curp_inactivo(id_inactivo);
+            if (curp == curp_inactivo)
+            {
+
+                Dictionary<string, object> paciente = new Dictionary<string, object>// Crea un diccionario para almacenar los datos personales
+            {
+                { "curp", curp },
+                { "nombres", nombres },
+                { "apellido_materno", apellidoMaterno },
+                { "apellido_paterno", apellidoPaterno },
+                { "estado_actual",1 }
+            };
+                dato.ActualizarTablas("paciente", paciente, "id_paciente", id_inactivo);
+                Dictionary<string, object> estancia = new Dictionary<string, object>
+            {
+              {"id_paciente",id_inactivo},
+              {"fecha_entrada",fechaEntrada},
+              {"fecha_salida", fechaDefecto}
+            };
+                int id_estancia = dato.Insertar("estancias", estancia);
+
+                // Inserta los datos del medicamentoElegido en la base de datos
+                Dictionary<string, object> tratamiento = new Dictionary<string, object>
+            {
+                {"id_estancia",id_estancia },
+                {"id_medico",medico.id_medico },
+                {"id_causa",causa.Id_causas },
+                {"estudio_clinico",respuesta2 }
+            };
+                int id_tratamiento = dato.Insertar("tratamiento", tratamiento);
+
+
+                foreach (DataGridViewRow row in dgvDatos.Rows)
+                {
+                    if (!row.IsNewRow)
+                    {
+                        int idMedicamento = Convert.ToInt32(row.Cells["Id_medicamento"].Value);
+                        int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
+                        int tiempoAdministracion = Convert.ToInt32(row.Cells["Administracion"].Value);
+                        string efectoSecundario = row.Cells["Efecto_secundario"].Value?.ToString() ?? string.Empty;
+
+                        Dictionary<string, object> datosTratamientoMedicamento = new Dictionary<string, object>
+
+                   {
+                        {"id_tratamiento",id_tratamiento },
+                        { "id_medicamento", idMedicamento },
+                        { "cantidad", cantidad },
+                        { "tiempo_administracion", tiempoAdministracion },
+                        {"efecto_secundario", efectoSecundario },
+
+                   };
+
+                        dato.Insertar("tratamiento_medicamento", datosTratamientoMedicamento);
+                    }
+
+                    txtNombres.Clear();
+                    txtAdministracion.Clear();
+                    txtApellidoMeterno.Clear();
+                    txtApellidoPaterno.Clear();
+                    txtCurp.Clear();
+                    cmbMedicamentos.SelectedIndex = -1;//Regresa a una pocision anterior
+                    txtAdministracion.Clear();//
+                    txtCantidad.Clear();
+                    txtEfectoSecundario.Clear();
+                    dgvDatos.Rows.Clear(); // Limpia el DataGridView después de actualizar
+                    btnActualizar.Visible = false; // Deshabilita el botón de actualizar después de guardar
+                    guardarbtn.Visible = true; // Habilita el botón de guardar después de actualizar
+                }
+
+            }
+        }
 
 
         private void txtCurp_TextChanged(object sender, EventArgs e)
@@ -207,7 +296,7 @@ namespace Proyecto_Integrador
             {
                 MessageBox.Show("La CURP no puede tener más de 18 caracteres.");
 
-                txtCurp.Text = txtCurp.Text.Substring(0,18); // Limita la CURP a 18 caracteres
+                txtCurp.Text = txtCurp.Text.Substring(0, 18); // Limita la CURP a 18 caracteres
             }
             ValidarFormulario();
 
@@ -267,27 +356,27 @@ namespace Proyecto_Integrador
             soloLetras(e);
         }
 
-        private void txtApellidoPaterno_KeyPress(Object sender, KeyPressEventArgs e)
+        private void txtApellidoPaterno_KeyPress(object sender, KeyPressEventArgs e)
         {
             soloLetras(e);
         }
 
-        private void txtCausa_KeyPress(Object sender, KeyPressEventArgs e)
+        private void txtCausa_KeyPress(object sender, KeyPressEventArgs e)
         {
             soloLetras(e);
         }
 
-        private void txtEfectoSecundario_KeyPress(Object sender, KeyPressEventArgs e)
+        private void txtEfectoSecundario_KeyPress(object sender, KeyPressEventArgs e)
         {
             soloLetras(e);
         }
         //SOLO ACEPTE NUMEROS
-        private void txtCantidad_KeyPress(Object sender, KeyPressEventArgs e)
+        private void txtCantidad_KeyPress(object sender, KeyPressEventArgs e)
         {
             SoloNumeros(e);
         }
 
-        private void txtAdministracion_KeyPress(Object seder, KeyPressEventArgs e)
+        private void txtAdministracion_KeyPress(object sender, KeyPressEventArgs e)
         {
             SoloNumeros(e);
         }
@@ -306,23 +395,23 @@ namespace Proyecto_Integrador
             Advertencia(e, txtEfectoSecundario);
         }
 
-        private void txtAdministracion_Validating(Object sender, System.ComponentModel.CancelEventArgs e)
+        private void txtAdministracion_Validating(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Advertencia(e, txtAdministracion);
         }
 
-        private void txtApellidoMaterno_Validating(object seneder, System.ComponentModel.CancelEventArgs e)
+        private void txtApellidoMaterno_Validating(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Advertencia(e, txtApellidoMeterno);
         }
 
 
-        private void txtApellidoPaterno_Validating(Object sender, System.ComponentModel.CancelEventArgs e)
+        private void txtApellidoPaterno_Validating(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Advertencia(e, txtApellidoPaterno);
         }
 
-        private void txtCurp_Validating(Object sender, System.ComponentModel.CancelEventArgs e)
+        private void txtCurp_Validating(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Advertencia(e, txtCurp);
         }
@@ -340,7 +429,7 @@ namespace Proyecto_Integrador
             ValidarFormulario();
         }
 
-        private void txtApellidoPaterno_TextChanged(Object sender, EventArgs e)
+        private void txtApellidoPaterno_TextChanged(object sender, EventArgs e)
         {
             ValidarFormulario();
         }
@@ -355,7 +444,7 @@ namespace Proyecto_Integrador
         {
             ValidarFormulario();
         }
-        private void cmbCausa_SelectedIndexChanged(Object sender, EventArgs e)
+        private void cmbCausa_SelectedIndexChanged(object sender, EventArgs e)
         {
             ValidarFormulario();
         }
@@ -418,7 +507,8 @@ namespace Proyecto_Integrador
             .Cast<DataGridViewRow>()
             .Any(row => !row.IsNewRow && row.Cells.Cast<DataGridViewCell>().Any(cell => cell.Value != null));
 
-            guardarbtn.Enabled = textBoxesLlenos && comboSeleccionados && dataGridConDatos&&comboCausa;
+            guardarbtn.Enabled = textBoxesLlenos && comboSeleccionados && dataGridConDatos && comboCausa;
+            btnActualizar.Enabled = textBoxesLlenos && comboSeleccionados && dataGridConDatos && comboCausa;
         }
 
         private void btnEliminar_Click(object sender, EventArgs e)
@@ -439,6 +529,14 @@ namespace Proyecto_Integrador
                 MessageBox.Show("Por favor, selecciona una fila para eliminar.");
             }
 
+        }
+        // Función para permitir solo letras y números en el campo CURP
+        private void txtCurp_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsLetterOrDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true; // Cancela la entrada del carácter
+            }
         }
     }
 

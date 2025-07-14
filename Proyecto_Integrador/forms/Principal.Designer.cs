@@ -40,7 +40,8 @@ namespace Proyecto_Integrador
             Activos = new TabPage();
             flowLayoutPanel1 = new FlowLayoutPanel();
             Registar = new TabPage();
-            panel2 = new Panel();
+            panelRegistrar = new Panel();
+            btnActualizar = new Button();
             label2 = new Label();
             cmbTipo = new ComboBox();
             cmbCausa = new ComboBox();
@@ -82,7 +83,7 @@ namespace Proyecto_Integrador
             Historial.SuspendLayout();
             Activos.SuspendLayout();
             Registar.SuspendLayout();
-            panel2.SuspendLayout();
+            panelRegistrar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvDatos).BeginInit();
             tabControlMenu.SuspendLayout();
             Mensajebienvenida.SuspendLayout();
@@ -190,7 +191,7 @@ namespace Proyecto_Integrador
             // Registar
             // 
             Registar.BackColor = Color.FromArgb(129, 166, 100);
-            Registar.Controls.Add(panel2);
+            Registar.Controls.Add(panelRegistrar);
             Registar.Controls.Add(label1);
             Registar.Font = new Font("Segoe UI", 16.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Registar.Location = new Point(4, 29);
@@ -200,48 +201,63 @@ namespace Proyecto_Integrador
             Registar.TabIndex = 0;
             Registar.Text = "Registrar";
             // 
-            // panel2
+            // panelRegistrar
             // 
-            panel2.Anchor = AnchorStyles.Top;
-            panel2.AutoScroll = true;
-            panel2.BackColor = Color.FromArgb(129, 166, 100);
-            panel2.Controls.Add(label2);
-            panel2.Controls.Add(cmbTipo);
-            panel2.Controls.Add(cmbCausa);
-            panel2.Controls.Add(btnEliminar);
-            panel2.Controls.Add(btnAgregar);
-            panel2.Controls.Add(cmbMedico);
-            panel2.Controls.Add(guardarbtn);
-            panel2.Controls.Add(dtimeEntrada);
-            panel2.Controls.Add(dgvDatos);
-            panel2.Controls.Add(cmbMedicamentos);
-            panel2.Controls.Add(rbtnNOEstudiosClinicos);
-            panel2.Controls.Add(rbtnSIEstudiosClinicos);
-            panel2.Controls.Add(label12);
-            panel2.Controls.Add(label6);
-            panel2.Controls.Add(label8);
-            panel2.Controls.Add(label17);
-            panel2.Controls.Add(label16);
-            panel2.Controls.Add(label15);
-            panel2.Controls.Add(label10);
-            panel2.Controls.Add(label7);
-            panel2.Controls.Add(txtCantidad);
-            panel2.Controls.Add(txtEfectoSecundario);
-            panel2.Controls.Add(txtAdministracion);
-            panel2.Controls.Add(txtApellidoMeterno);
-            panel2.Controls.Add(txtApellidoPaterno);
-            panel2.Controls.Add(label18);
-            panel2.Controls.Add(label13);
-            panel2.Controls.Add(label11);
-            panel2.Controls.Add(label9);
-            panel2.Controls.Add(label5);
-            panel2.Controls.Add(txtCurp);
-            panel2.Controls.Add(txtNombres);
-            panel2.Location = new Point(0, 0);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(997, 683);
-            panel2.TabIndex = 1;
-            panel2.Paint += panel2_Paint;
+            panelRegistrar.Anchor = AnchorStyles.Top;
+            panelRegistrar.AutoScroll = true;
+            panelRegistrar.BackColor = Color.FromArgb(129, 166, 100);
+            panelRegistrar.Controls.Add(btnActualizar);
+            panelRegistrar.Controls.Add(label2);
+            panelRegistrar.Controls.Add(cmbTipo);
+            panelRegistrar.Controls.Add(cmbCausa);
+            panelRegistrar.Controls.Add(btnEliminar);
+            panelRegistrar.Controls.Add(btnAgregar);
+            panelRegistrar.Controls.Add(cmbMedico);
+            panelRegistrar.Controls.Add(guardarbtn);
+            panelRegistrar.Controls.Add(dtimeEntrada);
+            panelRegistrar.Controls.Add(dgvDatos);
+            panelRegistrar.Controls.Add(cmbMedicamentos);
+            panelRegistrar.Controls.Add(rbtnNOEstudiosClinicos);
+            panelRegistrar.Controls.Add(rbtnSIEstudiosClinicos);
+            panelRegistrar.Controls.Add(label12);
+            panelRegistrar.Controls.Add(label6);
+            panelRegistrar.Controls.Add(label8);
+            panelRegistrar.Controls.Add(label17);
+            panelRegistrar.Controls.Add(label16);
+            panelRegistrar.Controls.Add(label15);
+            panelRegistrar.Controls.Add(label10);
+            panelRegistrar.Controls.Add(label7);
+            panelRegistrar.Controls.Add(txtCantidad);
+            panelRegistrar.Controls.Add(txtEfectoSecundario);
+            panelRegistrar.Controls.Add(txtAdministracion);
+            panelRegistrar.Controls.Add(txtApellidoMeterno);
+            panelRegistrar.Controls.Add(txtApellidoPaterno);
+            panelRegistrar.Controls.Add(label18);
+            panelRegistrar.Controls.Add(label13);
+            panelRegistrar.Controls.Add(label11);
+            panelRegistrar.Controls.Add(label9);
+            panelRegistrar.Controls.Add(label5);
+            panelRegistrar.Controls.Add(txtCurp);
+            panelRegistrar.Controls.Add(txtNombres);
+            panelRegistrar.Location = new Point(0, 0);
+            panelRegistrar.Name = "panelRegistrar";
+            panelRegistrar.Size = new Size(997, 683);
+            panelRegistrar.TabIndex = 1;
+            panelRegistrar.Paint += panel2_Paint;
+            // 
+            // btnActualizar
+            // 
+            btnActualizar.BackColor = Color.FromArgb(177, 232, 134);
+            btnActualizar.FlatStyle = FlatStyle.Flat;
+            btnActualizar.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnActualizar.Location = new Point(628, 1320);
+            btnActualizar.Name = "btnActualizar";
+            btnActualizar.Size = new Size(218, 46);
+            btnActualizar.TabIndex = 16;
+            btnActualizar.Text = "Actualizar";
+            btnActualizar.UseVisualStyleBackColor = false;
+            btnActualizar.Visible = false;
+            btnActualizar.Click += btnActualizar_Click;
             // 
             // label2
             // 
@@ -312,9 +328,9 @@ namespace Proyecto_Integrador
             guardarbtn.BackColor = Color.FromArgb(177, 232, 134);
             guardarbtn.FlatStyle = FlatStyle.Flat;
             guardarbtn.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            guardarbtn.Location = new Point(723, 1339);
+            guardarbtn.Location = new Point(723, 1323);
             guardarbtn.Name = "guardarbtn";
-            guardarbtn.Size = new Size(218, 52);
+            guardarbtn.Size = new Size(218, 43);
             guardarbtn.TabIndex = 7;
             guardarbtn.Text = "Guardar";
             guardarbtn.UseVisualStyleBackColor = false;
@@ -595,6 +611,7 @@ namespace Proyecto_Integrador
             txtCurp.Size = new Size(270, 32);
             txtCurp.TabIndex = 0;
             txtCurp.TextChanged += txtCurp_TextChanged;
+            txtCurp.KeyPress += txtCurp_KeyPress;
             txtCurp.Validating += txtCurp_Validating;
             // 
             // txtNombres
@@ -679,8 +696,8 @@ namespace Proyecto_Integrador
             Activos.ResumeLayout(false);
             Registar.ResumeLayout(false);
             Registar.PerformLayout();
-            panel2.ResumeLayout(false);
-            panel2.PerformLayout();
+            panelRegistrar.ResumeLayout(false);
+            panelRegistrar.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvDatos).EndInit();
             tabControlMenu.ResumeLayout(false);
             Mensajebienvenida.ResumeLayout(false);
@@ -714,7 +731,7 @@ namespace Proyecto_Integrador
         private TabControl tabControlMenu;
         private TabPage Mensajebienvenida;
         private Label label4;
-        private Panel panel2;
+        private Panel panelRegistrar;
         private TextBox txtNombres;
         private Label label5;
         private Label label6;
@@ -749,5 +766,6 @@ namespace Proyecto_Integrador
         private ComboBox cmbCausa;
         private Label label2;
         private ComboBox cmbTipo;
+        private Button btnActualizar;
     }
 }
