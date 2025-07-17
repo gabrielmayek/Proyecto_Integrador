@@ -112,7 +112,7 @@ namespace Proyecto_Integrador
             btnHistorial.Location = new Point(7, 246);
             btnHistorial.Name = "btnHistorial";
             btnHistorial.Size = new Size(135, 86);
-            btnHistorial.TabIndex = 4;
+            btnHistorial.TabIndex = 20;
             btnHistorial.Text = "Historial";
             btnHistorial.UseVisualStyleBackColor = false;
             btnHistorial.Click += btnHistorial_Click;
@@ -127,7 +127,7 @@ namespace Proyecto_Integrador
             btnActivos.Location = new Point(7, 154);
             btnActivos.Name = "btnActivos";
             btnActivos.Size = new Size(135, 86);
-            btnActivos.TabIndex = 3;
+            btnActivos.TabIndex = 19;
             btnActivos.Text = "Pacientes Activos";
             btnActivos.UseVisualStyleBackColor = false;
             btnActivos.Click += btnActivos_Click;
@@ -143,7 +143,7 @@ namespace Proyecto_Integrador
             btnRegistar.Location = new Point(7, 62);
             btnRegistar.Name = "btnRegistar";
             btnRegistar.Size = new Size(135, 86);
-            btnRegistar.TabIndex = 0;
+            btnRegistar.TabIndex = 18;
             btnRegistar.Text = "Registar";
             btnRegistar.UseVisualStyleBackColor = false;
             btnRegistar.Click += btnRegistar_Click;
@@ -250,7 +250,7 @@ namespace Proyecto_Integrador
             btnActualizar.BackColor = Color.FromArgb(177, 232, 134);
             btnActualizar.FlatStyle = FlatStyle.Flat;
             btnActualizar.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnActualizar.Location = new Point(628, 1320);
+            btnActualizar.Location = new Point(562, 1320);
             btnActualizar.Name = "btnActualizar";
             btnActualizar.Size = new Size(218, 46);
             btnActualizar.TabIndex = 16;
@@ -277,7 +277,7 @@ namespace Proyecto_Integrador
             cmbTipo.Location = new Point(157, 836);
             cmbTipo.Name = "cmbTipo";
             cmbTipo.Size = new Size(114, 33);
-            cmbTipo.TabIndex = 14;
+            cmbTipo.TabIndex = 11;
             // 
             // cmbCausa
             // 
@@ -286,7 +286,7 @@ namespace Proyecto_Integrador
             cmbCausa.Location = new Point(29, 383);
             cmbCausa.Name = "cmbCausa";
             cmbCausa.Size = new Size(534, 33);
-            cmbCausa.TabIndex = 13;
+            cmbCausa.TabIndex = 4;
             cmbCausa.SelectedIndexChanged += cmbCausa_SelectedIndexChanged;
             // 
             // btnEliminar
@@ -296,7 +296,7 @@ namespace Proyecto_Integrador
             btnEliminar.Location = new Point(472, 1224);
             btnEliminar.Name = "btnEliminar";
             btnEliminar.Size = new Size(213, 46);
-            btnEliminar.TabIndex = 12;
+            btnEliminar.TabIndex = 13;
             btnEliminar.Text = "Eliminar";
             btnEliminar.UseVisualStyleBackColor = false;
             btnEliminar.Click += btnEliminar_Click;
@@ -308,7 +308,7 @@ namespace Proyecto_Integrador
             btnAgregar.Location = new Point(723, 1224);
             btnAgregar.Name = "btnAgregar";
             btnAgregar.Size = new Size(218, 46);
-            btnAgregar.TabIndex = 11;
+            btnAgregar.TabIndex = 14;
             btnAgregar.Text = "Agregar";
             btnAgregar.UseVisualStyleBackColor = false;
             btnAgregar.Click += btnAgregar_Click;
@@ -320,7 +320,7 @@ namespace Proyecto_Integrador
             cmbMedico.Location = new Point(32, 1339);
             cmbMedico.Name = "cmbMedico";
             cmbMedico.Size = new Size(487, 33);
-            cmbMedico.TabIndex = 10;
+            cmbMedico.TabIndex = 15;
             cmbMedico.SelectedIndexChanged += cmbMedico_SelectedIndexChanged;
             // 
             // guardarbtn
@@ -331,7 +331,7 @@ namespace Proyecto_Integrador
             guardarbtn.Location = new Point(723, 1323);
             guardarbtn.Name = "guardarbtn";
             guardarbtn.Size = new Size(218, 43);
-            guardarbtn.TabIndex = 7;
+            guardarbtn.TabIndex = 17;
             guardarbtn.Text = "Guardar";
             guardarbtn.UseVisualStyleBackColor = false;
             guardarbtn.Click += guardarbtn_Click;
@@ -343,7 +343,7 @@ namespace Proyecto_Integrador
             dtimeEntrada.Location = new Point(633, 383);
             dtimeEntrada.Name = "dtimeEntrada";
             dtimeEntrada.Size = new Size(270, 32);
-            dtimeEntrada.TabIndex = 8;
+            dtimeEntrada.TabIndex = 5;
             dtimeEntrada.Value = new DateTime(2025, 7, 5, 0, 0, 0, 0);
             // 
             // dgvDatos
@@ -366,7 +366,7 @@ namespace Proyecto_Integrador
             cmbMedicamentos.Location = new Point(41, 696);
             cmbMedicamentos.Name = "cmbMedicamentos";
             cmbMedicamentos.Size = new Size(565, 33);
-            cmbMedicamentos.TabIndex = 4;
+            cmbMedicamentos.TabIndex = 8;
             // 
             // rbtnNOEstudiosClinicos
             // 
@@ -375,7 +375,7 @@ namespace Proyecto_Integrador
             rbtnNOEstudiosClinicos.Location = new Point(30, 545);
             rbtnNOEstudiosClinicos.Name = "rbtnNOEstudiosClinicos";
             rbtnNOEstudiosClinicos.Size = new Size(75, 42);
-            rbtnNOEstudiosClinicos.TabIndex = 3;
+            rbtnNOEstudiosClinicos.TabIndex = 7;
             rbtnNOEstudiosClinicos.TabStop = true;
             rbtnNOEstudiosClinicos.Text = "No";
             rbtnNOEstudiosClinicos.UseVisualStyleBackColor = true;
@@ -387,7 +387,7 @@ namespace Proyecto_Integrador
             rbtnSIEstudiosClinicos.Location = new Point(30, 497);
             rbtnSIEstudiosClinicos.Name = "rbtnSIEstudiosClinicos";
             rbtnSIEstudiosClinicos.Size = new Size(60, 42);
-            rbtnSIEstudiosClinicos.TabIndex = 3;
+            rbtnSIEstudiosClinicos.TabIndex = 6;
             rbtnSIEstudiosClinicos.TabStop = true;
             rbtnSIEstudiosClinicos.Text = "Si";
             rbtnSIEstudiosClinicos.UseVisualStyleBackColor = true;
@@ -494,7 +494,7 @@ namespace Proyecto_Integrador
             txtCantidad.Location = new Point(41, 837);
             txtCantidad.Name = "txtCantidad";
             txtCantidad.Size = new Size(100, 32);
-            txtCantidad.TabIndex = 0;
+            txtCantidad.TabIndex = 10;
             txtCantidad.TextChanged += txtCantidad_TextChanged;
             txtCantidad.KeyPress += txtCantidad_KeyPress;
             txtCantidad.Validating += txtCantidad_Validating;
@@ -505,7 +505,7 @@ namespace Proyecto_Integrador
             txtEfectoSecundario.Location = new Point(422, 837);
             txtEfectoSecundario.Name = "txtEfectoSecundario";
             txtEfectoSecundario.Size = new Size(250, 32);
-            txtEfectoSecundario.TabIndex = 0;
+            txtEfectoSecundario.TabIndex = 12;
             txtEfectoSecundario.TextChanged += txtEfectoSecundario_TextChanged;
             txtEfectoSecundario.KeyPress += txtEfectoSecundario_KeyPress;
             txtEfectoSecundario.Validating += txtEfectoSecundario_Validating;
@@ -516,7 +516,7 @@ namespace Proyecto_Integrador
             txtAdministracion.Location = new Point(648, 697);
             txtAdministracion.Name = "txtAdministracion";
             txtAdministracion.Size = new Size(100, 32);
-            txtAdministracion.TabIndex = 0;
+            txtAdministracion.TabIndex = 9;
             txtAdministracion.KeyPress += txtAdministracion_KeyPress;
             txtAdministracion.Validating += txtAdministracion_Validating;
             // 
@@ -526,7 +526,7 @@ namespace Proyecto_Integrador
             txtApellidoMeterno.Location = new Point(360, 111);
             txtApellidoMeterno.Name = "txtApellidoMeterno";
             txtApellidoMeterno.Size = new Size(200, 32);
-            txtApellidoMeterno.TabIndex = 0;
+            txtApellidoMeterno.TabIndex = 1;
             txtApellidoMeterno.TextChanged += txtApellidoMaterno_TextChanged;
             txtApellidoMeterno.KeyPress += txtApellidoMeterno_KeyPress;
             txtApellidoMeterno.Validating += txtApellidoMaterno_Validating;
@@ -537,7 +537,7 @@ namespace Proyecto_Integrador
             txtApellidoPaterno.Location = new Point(640, 111);
             txtApellidoPaterno.Name = "txtApellidoPaterno";
             txtApellidoPaterno.Size = new Size(200, 32);
-            txtApellidoPaterno.TabIndex = 0;
+            txtApellidoPaterno.TabIndex = 2;
             txtApellidoPaterno.TextChanged += txtApellidoPaterno_TextChanged;
             txtApellidoPaterno.KeyPress += txtApellidoPaterno_KeyPress;
             txtApellidoPaterno.Validating += txtApellidoPaterno_Validating;
@@ -609,7 +609,7 @@ namespace Proyecto_Integrador
             txtCurp.Location = new Point(29, 213);
             txtCurp.Name = "txtCurp";
             txtCurp.Size = new Size(270, 32);
-            txtCurp.TabIndex = 0;
+            txtCurp.TabIndex = 3;
             txtCurp.TextChanged += txtCurp_TextChanged;
             txtCurp.KeyPress += txtCurp_KeyPress;
             txtCurp.Validating += txtCurp_Validating;

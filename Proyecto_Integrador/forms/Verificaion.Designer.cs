@@ -41,9 +41,9 @@
             label1.ForeColor = Color.Transparent;
             label1.Location = new Point(96, 27);
             label1.Name = "label1";
-            label1.Size = new Size(191, 31);
+            label1.Size = new Size(196, 31);
             label1.TabIndex = 0;
-            label1.Text = "registro existente";
+            label1.Text = "Registro existente";
             // 
             // label2
             // 
@@ -92,7 +92,6 @@
             Controls.Add(label2);
             Controls.Add(label1);
             Name = "Verificacion";
-            Text = "w";
             Load += Verificaion_Load;
             ResumeLayout(false);
             PerformLayout();

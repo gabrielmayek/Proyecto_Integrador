@@ -10,10 +10,11 @@ namespace Proyecto_Integrador.Models
     {
         public int id_tratamiento {  get; set; }
 
-        public int id_medicaemto { get; set; }
+        public int id_medicamento { get; set; }
 
         public int cantidad { get; set; }
         public int tiempoAdministracion {  get; set; }  
+        public string? UsoActualmente {  get; set; }
 
         public string? Efecto_secundario { get; set; }
 

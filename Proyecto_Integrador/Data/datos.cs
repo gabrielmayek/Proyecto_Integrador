@@ -18,12 +18,8 @@ namespace Proyecto_Integrador.Data
     {
         //APARTADO REGISTRAR GABRIEL EDUARDO MAY EK
         private string CadenaConexion = "Server=localhost;User=root;Password=admin;Port=3306;database=Proyecto_integrador";
-        // Cambia la cadena de conexión según tu configuración
-        // Método para insertar datos en una tabla específica de la base de datos
-        //Dictionario que contiene los nombres de las columnas y sus valores
-        //Dictionary es una colección de clave-valor, donde cada clave es un nombre de columna y su valor es el valor a insertar en esa columna
-        //datos es un diccionario que contiene los nombres de las columnas y sus valores
-        // Método genérico para insertar datos y devolver el ID generado
+
+        //Insertar datos en la base de datos
         public int Insertar(string tabla, Dictionary<string, object> datos)
         {
             if (datos == null || datos.Count == 0)
@@ -31,46 +27,24 @@ namespace Proyecto_Integrador.Data
                 MessageBox.Show("No se proporcionaron datos para insertar.");
                 return -1;
             }
-            // Unir las claves del diccionario en una cadena separada por comas
-            // Join es un método que une los elementos de una colección en una sola cadena,
-            // separándolos por el delimitador especificado
-            // En este caso, se unen las claves del diccionario en una cadena separada por comas
+
             string columnas = string.Join(",", datos.Keys);
-            //un string.Join es un método que une los elementos de una colección en una sola cadena,
-            // separándolos por el delimitador especificado
-            // En este caso, se unen las claves del diccionario en una cadena separada por comas
-
-            //Keys es una propiedad del diccionario que devuelve una colección de las claves del diccionario
-            // Unir las claves del diccionario en una cadena separada por comas, precedidas por '@' para usarlas como parámetros
-            // @ es un prefijo que indica que se trata de un parámetro en la consulta SQL
-            // Esto es útil para evitar inyecciones SQL y mejorar la seguridad de la consulta
             string valores = "@" + string.Join(",@", datos.Keys);
-            //datos.Keys es una colección de las claves del diccionario, que son los nombres de las columnas
-            // Crear una cadena de consulta SQL para insertar los datos en la tabla especificada
             string consulta = $"INSERT INTO {tabla} ({columnas}) VALUES ({valores}); SELECT LAST_INSERT_ID();";
-
-
             using (MySqlConnection conexion = new MySqlConnection(CadenaConexion))
             {
                 MySqlCommand comando = new MySqlCommand(consulta, conexion);
-                // Crear un nuevo comando SQL con la consulta y la conexión
+   
                 foreach (var dato in datos)
-                // Recorrer cada par clave-valor en el diccionario
+         
                 {
                     comando.Parameters.AddWithValue("@" + dato.Key, dato.Value);
-                    // Agregar el parámetro al comando con el valor correspondiente
-                    // AddWithValue es un método que agrega un parámetro
-                    // al comando con el nombre y el valor especificados
-                    //Value es una propiedad del parámetro que contiene el valor del parámetro
                 }
 
                 try
                 {
                     conexion.Open();
                     return Convert.ToInt32(comando.ExecuteScalar());
-                    //ExecuteScalar es un método que ejecuta la consulta
-                    //y devuelve el primer valor de la primera fila del resultado
-                    // Ejecutar la consulta y obtener el último ID insertado como un entero
                 }
                 catch (Exception ex)
                 {
@@ -210,7 +184,7 @@ namespace Proyecto_Integrador.Data
             List<Causas> Lcausas = new List<Causas>();
             using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
             {
-                MySqlCommand command = new MySqlCommand(query,connection);
+                MySqlCommand command = new MySqlCommand(query, connection);
                 try
                 {
                     connection.Open();
@@ -224,22 +198,22 @@ namespace Proyecto_Integrador.Data
 
                         });
                     }
-                        Lcausas.Insert(0, new Causas { causa = "Seleccione ..." });
-                    
+                    Lcausas.Insert(0, new Causas { causa = "Seleccione ..." });
+
                 }
-                catch(Exception ex) 
+                catch (Exception ex)
                 {
                     MessageBox.Show($"Error al cargar  las causas :{ex.Message}");
                 }
-                comboBox.DataSource= Lcausas;
+                comboBox.DataSource = Lcausas;
                 comboBox.DisplayMember = "causa";
                 comboBox.ValueMember = "Id_causas";
 
             }
-        
+
         }
 
-
+        // Método para obtener el ID de un paciente inactivo por su CURP
         public int id_inactivo(string curp)//
         {
             int id_obtenido = 0;
@@ -262,9 +236,32 @@ namespace Proyecto_Integrador.Data
             }
         }
 
+        // Método para obtener el estado actual de un paciente por su CURP
+        public int EstadoActual(string curp)//
+        {
+            int id_obtenido = 0;
+            string query = $"select estado_actual from paciente where curp='{curp}'";
+            using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
+            {
+                MySqlCommand commandos = new MySqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    id_obtenido = Convert.ToInt32(commandos.ExecuteScalar());
+                    // ExecuteScalar es un método que ejecuta la consulta y devuelve el primer valor de la primera fila del resultado
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al conectar 1", ex.Message);
+                    return -1;
+                }
+                return Convert.ToInt32(id_obtenido);
+            }
+        }
+        // Método para obtener el CURP de un paciente inactivo por su ID
         public string curp_inactivo(int id)//
         {
-            string curp="";
+            string curp = "";
             string query = $"select curp from paciente where estado_actual = 0 and id_paciente={id}";
             using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
             {
@@ -280,7 +277,7 @@ namespace Proyecto_Integrador.Data
                     }
                     else
                     {
-                       curp = "curp no encontrada";
+                        curp = "curp no encontrada";
                     }
 
                 }
@@ -288,21 +285,18 @@ namespace Proyecto_Integrador.Data
                 {
                     MessageBox.Show("Error al conectar 2", ex.Message);
                 }
-                return curp ;
+                return curp;
             }
         }
-
-
-
-
-        public Paciente ObtenerDatosPaciente(string curp)
+        // Método para obtener los datos de un paciente por su CURP y estado actual
+        public Paciente ObtenerDatosPaciente(string curp, int Estado)
         {
             Paciente datos = null;
 
             using (var connection = new MySqlConnection(CadenaConexion))
             {
                 connection.Open();
-                string query = "SELECT * FROM paciente WHERE estado_actual=0";
+                string query = $"SELECT * FROM paciente WHERE estado_actual={Estado} and curp = '{curp}'";
 
                 using (var command = new MySqlCommand(query, connection))
                 {
@@ -335,15 +329,15 @@ namespace Proyecto_Integrador.Data
 
             return datos;
         }
-
+        // Método para obtener la última estancia de un paciente por su ID
         public Estancias OBtenerEstancias(int id)
         {
             Estancias estancias = null;
             using (var connection = new MySqlConnection(CadenaConexion))
             {
                 connection.Open();
-                string query = $"select * from estancias where id_paciente={id}";
-                using(var command = new MySqlCommand(query,connection))
+                string query = $"select * from estancias where id_paciente={id} ORDER BY fecha_entrada DESC LIMIT 1;";
+                using (var command = new MySqlCommand(query, connection))
                 {
                     try
                     {
@@ -360,16 +354,14 @@ namespace Proyecto_Integrador.Data
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Error al conectar 4",ex.Message);
+                        MessageBox.Show("Error al conectar 4", ex.Message);
                     }
                 }
             }
-
-
             return estancias;
         }
 
-
+        // Método para obtener el tratamiento asociado a una estancia por su ID
         public Tratamiento ObtenerTratamiento(int id)
         {
             Tratamiento datos = null;
@@ -379,7 +371,7 @@ namespace Proyecto_Integrador.Data
                 connection.Open();
                 try
                 {
-                    string query = $"SELECT * FROM tratamiento WHERE id_estancia ={id} ";
+                    string query = $"SELECT * FROM tratamiento WHERE id_estancia ={id}";
                     using (var command = new MySqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@id", id);
@@ -391,6 +383,7 @@ namespace Proyecto_Integrador.Data
                                 {
                                     id_tratamiento = reader.GetInt32("id_tratamiento"),
                                     estudio_clinico = reader.GetInt32("estudio_clinico")
+                                    // Aquí puedes agregar más propiedades según tu modelo
 
                                 };
                             }
@@ -405,70 +398,91 @@ namespace Proyecto_Integrador.Data
 
             return datos;
         }
-     
 
 
-            public List<Tratamiento_medicamento> ObtenertratamientoConMedicamentos(int id)
+        // Método para obtener los medicamentos asociados a un tratamiento por su ID
+        public List<Tratamiento_medicamento> ObtenertratamientoConMedicamentos(int id)
+        {
+            var medicamentos = new List<Medicamento>();
+            var tratamientos = new List<Tratamiento_medicamento>();
+
+            using (var conn = new MySqlConnection(CadenaConexion))
             {
-                var medicamentos = new List<Medicamento>();
-                var tratamientos = new List<Tratamiento_medicamento>();
+                conn.Open();
 
-                using (var conn = new MySqlConnection(CadenaConexion))
+                // Obtener medicamentos de su tabla
+                using (var cmd = new MySqlCommand("select * from medicamento", conn))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    conn.Open();
-
-                    // Obtener productos
-                    using (var cmd = new MySqlCommand("select * from medicamento", conn))
-                    using (var reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        medicamentos.Add(new Medicamento
                         {
-                            medicamentos.Add(new Medicamento
-                            {
-                                Id = reader.GetInt32("id_medicamentos"),
-                                Nombre = reader.GetString("nombre_medicamento")
-                            });
-                        }
+                            Id = reader.GetInt32("id_medicamentos"),
+                            Nombre = reader.GetString("nombre_medicamento")
+                        });
                     }
+                }
 
-                    // Obtener datos médicos
-                    using (var cmd = new MySqlCommand($"SELECT * from tratamiento_medicamento where id_tratamiento = {id}", conn))
-                    using (var reader = cmd.ExecuteReader())
+                // Obtener datos del tratamiento  haciendo relacion con la tabla medicamentos para los nombres
+                using (var cmd = new MySqlCommand($"SELECT * from tratamiento_medicamento where id_tratamiento = {id} and Uso_Actualmente = 'SI' ", conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
                         var dato = new Tratamiento_medicamento
                         {
 
                             id_tratamiento = reader.GetInt32("id_tratamiento"),
-                            id_medicaemto= reader.GetInt32("id_medicamento"),
+                            id_medicamento = reader.GetInt32("id_medicamento"),
                             cantidad = reader.GetInt32("cantidad"),
-                            tiempoAdministracion=reader.GetInt32("tiempo_administracion"),
-                            Efecto_secundario=reader.GetString("efecto_secundario")
+                            tiempoAdministracion = reader.GetInt32("tiempo_administracion"),
+                            UsoActualmente = reader.GetString("Uso_Actualmente"),
+                            Efecto_secundario = reader.GetString("efecto_secundario")
 
                         };
 
-                            // Relacionar con producto
-                            dato.Medicamento = medicamentos.FirstOrDefault(p => p.Id == dato.id_medicaemto);
-
-                            tratamientos.Add(dato);
-                        }
+                        // Relacionar con producto
+                        dato.Medicamento = medicamentos.FirstOrDefault(p => p.Id == dato.id_medicamento);
+                        tratamientos.Add(dato);
                     }
                 }
-
-                return tratamientos;
             }
+
+            return tratamientos;
         }
 
-    //APARTADO HISTORIAL
+
+        // Método para verificar si un paciente tiene una estancia activa
+        public bool EstanciaActiva(int idPaciente)
+        {
+            bool activa = false;
+            using (var connection = new MySqlConnection(CadenaConexion))
+            {
+                connection.Open();
+                string query = $"SELECT COUNT(*) FROM estancias WHERE id_paciente = {idPaciente} AND fecha_salida='2000-01-01 00:00:00'";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    try
+                    {
+                        int resultado = Convert.ToInt32(command.ExecuteScalar());
+                        activa = resultado == 1 ;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error al verificar estancia activa", ex.Message);
+                    }
+                }
+            }
+            return activa;
+        }
 
 
+       
 
+        //APARTADO HISTORIAL
 
-
-
-
-    
+    }
 }
 
 

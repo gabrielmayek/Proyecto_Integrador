@@ -1,6 +1,7 @@
 
 using Proyecto_Integrador.Data;
 using Proyecto_Integrador.Models;
+using System;
 using System.Reflection.Metadata;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -10,19 +11,18 @@ namespace Proyecto_Integrador
 {
     public partial class Principal : Form
     {
-
-
-        public System.Windows.Forms.TextBox txtnombres => txtNombres;
-        public System.Windows.Forms.TextBox txtcurp => txtCurp;
-        public System.Windows.Forms.TextBox txtapellido_paterno => txtApellidoPaterno;
-        public System.Windows.Forms.TextBox apellido_materno => txtApellidoMeterno;
-
-        public System.Windows.Forms.RadioButton radioButton => rbtnSIEstudiosClinicos;
-        public System.Windows.Forms.DataGridView dgvdatos => dgvDatos;
-        public System.Windows.Forms.ComboBox datos_del_medico => cmbMedico;
-        public System.Windows.Forms.Button guardar => guardarbtn;
-        public System.Windows.Forms.Button Actualiar => btnActualizar;
-        public System.Windows.Forms.Panel panel => panelRegistrar;
+        List<int> idsEliminados = new List<int>();
+        public System.Windows.Forms.TextBox Nombres => txtNombres;
+        public System.Windows.Forms.TextBox Curp => txtCurp;
+        public System.Windows.Forms.TextBox Apellido_paterno => txtApellidoPaterno;
+        public System.Windows.Forms.TextBox Apellido_materno => txtApellidoMeterno;
+        public System.Windows.Forms.RadioButton RadioButton => rbtnSIEstudiosClinicos;
+        public System.Windows.Forms.DataGridView Dgvdatos => dgvDatos;
+        public System.Windows.Forms.ComboBox Medico => cmbMedico;
+        public System.Windows.Forms.ComboBox Causa => cmbCausa;
+        public System.Windows.Forms.Button Guardar => guardarbtn;
+        public System.Windows.Forms.Button Actualizar => btnActualizar;
+        public System.Windows.Forms.Panel Panel => panelRegistrar;
 
 
         public Principal()
@@ -38,9 +38,9 @@ namespace Proyecto_Integrador
             cmbCausa.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             cmbCausa.AutoCompleteSource = AutoCompleteSource.ListItems;
             cmbMedicamentos.Text = "Selecciona un medicamento"; // Establece el texto predeterminado del ComboBox
-            cmbMedicamentos.Font = new Font("Verdana", 14);
+            cmbMedicamentos.Font = new Font("Verdana", 12);
             dtimeEntrada.Font = new Font("Verdana", 12);
-            guardarbtn.Enabled = false;
+     
             btnActualizar.Enabled = false;
             List<string> tipos = new List<string> { "mL", "L", "µL", "cc", "gota", "cdita", "cda", "mg", "g", "kg", "mcg", "ng", "UI", "U", "mEq", "mol", "mmol", "UFC" };
             cmbTipo.DataSource = tipos;
@@ -131,7 +131,8 @@ namespace Proyecto_Integrador
             //Datos Medicos del paciente
             int respuesta2 = rbtnSIEstudiosClinicos.Checked ? 1 : 0;// verifica que si se seleciono Si
             DateTime fechaEntrada = dtimeEntrada.Value;
-            DateTime fechaDefecto = new DateTime(2025, 7, 10, 9, 30, 0); // Año, mes, día, hora, minuto, segundo
+            DateTime fechaDefecto = new DateTime(2000, 1, 1, 0, 0, 0);
+            // Año, mes, día, hora, minuto, segundo
             //tratamiento del paciente
             string efectos = txtEfectoSecundario.Text;
             //Medico que atiende al paciente
@@ -145,6 +146,7 @@ namespace Proyecto_Integrador
                 { "estado_actual",1 }
             };
             int idPaciente = datos.Insertar("paciente", paciente);
+            // Inserta los datos del paciente en la base de datos y obtiene el ID del paciente
 
             Dictionary<string, object> estancia = new Dictionary<string, object>
             {
@@ -163,7 +165,11 @@ namespace Proyecto_Integrador
                 {"estudio_clinico",respuesta2 }
             };
             int id_tratamiento = datos.Insertar("tratamiento", tratamiento);
+            // Inserta los datos del tratamiento en la base de datos y obtiene el ID del tratamiento
 
+
+            //--------------------------------------------------------------------------------------//
+            // Recorre las filas del DataGridView y obtiene los datos de cada medicamento
 
             foreach (DataGridViewRow row in dgvDatos.Rows)
             {
@@ -179,6 +185,7 @@ namespace Proyecto_Integrador
                    {
                         {"id_tratamiento",id_tratamiento },
                         { "id_medicamento", idMedicamento },
+                        {"Uso_Actualmente","SI" },
                         { "cantidad", cantidad },
                         { "tiempo_administracion", tiempoAdministracion },
                         {"efecto_secundario", efectoSecundario },
@@ -188,17 +195,11 @@ namespace Proyecto_Integrador
                     datos.Insertar("tratamiento_medicamento", datosTratamientoMedicamento);
                 }
             }
-
-            txtNombres.Clear();
-            txtAdministracion.Clear();
-            txtApellidoMeterno.Clear();
-            txtApellidoPaterno.Clear();
-            cmbCausa.SelectedIndex = -1;
-            txtCurp.Clear();
+            limpiar();
 
         }
 
-        private void btnActualizar_Click(object sender, EventArgs e)
+    private void btnActualizar_Click(object sender, EventArgs e)
         {
 
             // Obtiene el médico seleccionado del ComboBox
@@ -215,79 +216,136 @@ namespace Proyecto_Integrador
             string nombres = txtNombres.Text;
             string apellidoMaterno = txtApellidoMeterno.Text;
             string apellidoPaterno = txtApellidoPaterno.Text;
-            int id_inactivo = dato.id_inactivo(curp);
-            string curp_inactivo = dato.curp_inactivo(id_inactivo);
-            if (curp == curp_inactivo)
+            int Activo = dato.EstadoActual(curp);
+            
+            if (Activo == 0)
             {
-
-                Dictionary<string, object> paciente = new Dictionary<string, object>// Crea un diccionario para almacenar los datos personales
-            {
-                { "curp", curp },
-                { "nombres", nombres },
-                { "apellido_materno", apellidoMaterno },
-                { "apellido_paterno", apellidoPaterno },
-                { "estado_actual",1 }
-            };
-                dato.ActualizarTablas("paciente", paciente, "id_paciente", id_inactivo);
-                Dictionary<string, object> estancia = new Dictionary<string, object>
-            {
-              {"id_paciente",id_inactivo},
-              {"fecha_entrada",fechaEntrada},
-              {"fecha_salida", fechaDefecto}
-            };
-                int id_estancia = dato.Insertar("estancias", estancia);
-
-                // Inserta los datos del medicamentoElegido en la base de datos
-                Dictionary<string, object> tratamiento = new Dictionary<string, object>
-            {
-                {"id_estancia",id_estancia },
-                {"id_medico",medico.id_medico },
-                {"id_causa",causa.Id_causas },
-                {"estudio_clinico",respuesta2 }
-            };
-                int id_tratamiento = dato.Insertar("tratamiento", tratamiento);
-
-
-                foreach (DataGridViewRow row in dgvDatos.Rows)
+                int id_inactivo = dato.id_inactivo(curp);
+                string curp_inactivo = dato.curp_inactivo(id_inactivo);
+                if (curp == curp_inactivo)
                 {
-                    if (!row.IsNewRow)
-                    {
-                        int idMedicamento = Convert.ToInt32(row.Cells["Id_medicamento"].Value);
-                        int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
-                        int tiempoAdministracion = Convert.ToInt32(row.Cells["Administracion"].Value);
-                        string efectoSecundario = row.Cells["Efecto_secundario"].Value?.ToString() ?? string.Empty;
+                    // Crea un diccionario para almacenar los datos personales
+                    Dictionary<string, object> paciente = new Dictionary<string, object>
+                  {
+                     { "curp", curp },
+                     { "nombres", nombres },
+                     { "apellido_materno", apellidoMaterno },
+                     { "apellido_paterno", apellidoPaterno },
+                     { "estado_actual",1 }
+                  };
+                    dato.ActualizarTablas("paciente", paciente, "id_paciente", id_inactivo);
+                    Dictionary<string, object> estancia = new Dictionary<string, object>
+                 {
+                   {"id_paciente",id_inactivo},
+                   {"fecha_entrada",fechaEntrada},
+                   {"fecha_salida", fechaDefecto}
+                 };
+                    int id_estancia = dato.Insertar("estancias", estancia);
 
-                        Dictionary<string, object> datosTratamientoMedicamento = new Dictionary<string, object>
+                    // Inserta los datos del medicamentoElegido en la base de datos
+                    Dictionary<string, object> tratamiento = new Dictionary<string, object>
+                  {
+                  {"id_estancia",id_estancia },
+                  {"id_medico",medico.id_medico },
+                  {"id_causa",causa.Id_causas },
+                  {"estudio_clinico",respuesta2 }
+                  };
+                    int id_tratamiento = dato.Insertar("tratamiento", tratamiento);
+
+
+                    foreach (DataGridViewRow row in dgvDatos.Rows)
+                    {
+                        if (!row.IsNewRow)
+                        {
+                            int idMedicamento = Convert.ToInt32(row.Cells["Id_medicamento"].Value);
+                            int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
+                            int tiempoAdministracion = Convert.ToInt32(row.Cells["Administracion"].Value);
+                            string efectoSecundario = row.Cells["Efecto_secundario"].Value?.ToString() ?? string.Empty;
+
+                            Dictionary<string, object> datosTratamientoMedicamento = new Dictionary<string, object>
 
                    {
                         {"id_tratamiento",id_tratamiento },
                         { "id_medicamento", idMedicamento },
                         { "cantidad", cantidad },
+                        {"Uso_Actualmente" ,"SI"},
                         { "tiempo_administracion", tiempoAdministracion },
                         {"efecto_secundario", efectoSecundario },
 
                    };
 
-                        dato.Insertar("tratamiento_medicamento", datosTratamientoMedicamento);
+                            dato.Insertar("tratamiento_medicamento", datosTratamientoMedicamento);
+                        }
+                     limpiar(); // Limpia los campos después de actualizar
                     }
-
-                    txtNombres.Clear();
-                    txtAdministracion.Clear();
-                    txtApellidoMeterno.Clear();
-                    txtApellidoPaterno.Clear();
-                    txtCurp.Clear();
-                    cmbMedicamentos.SelectedIndex = -1;//Regresa a una pocision anterior
-                    txtAdministracion.Clear();//
-                    txtCantidad.Clear();
-                    txtEfectoSecundario.Clear();
-                    dgvDatos.Rows.Clear(); // Limpia el DataGridView después de actualizar
-                    btnActualizar.Visible = false; // Deshabilita el botón de actualizar después de guardar
-                    guardarbtn.Visible = true; // Habilita el botón de guardar después de actualizar
                 }
 
             }
-        }
+            else
+            {
+             
+                var paciente = dato.ObtenerDatosPaciente(curp, Activo);
+                int  idPaciente = paciente.id_Paciente;
+                var estancia = dato.OBtenerEstancias(idPaciente);
+                var tratamiento = dato.ObtenerTratamiento(estancia.Id);
+                var UsoActualmente = dato.ObtenertratamientoConMedicamentos(tratamiento.id_tratamiento);
+                var idsEnUso = UsoActualmente.Where(m => m.UsoActualmente == "SI").Select(m => m.id_medicamento).ToHashSet();
+                var IdExiste= UsoActualmente.Where(m => m.UsoActualmente =="NO").Select(m => m.id_medicamento).ToHashSet().Except(idsEnUso);
 
+                if (dato.EstanciaActiva(idPaciente))
+                {
+                  
+                    foreach (DataGridViewRow row in dgvDatos.Rows)
+                    {
+                        if (!row.IsNewRow)
+                        {
+                            int idMedicamento = Convert.ToInt32(row.Cells["Id_medicamento"].Value);
+                            // Solo insertar si NO está en uso actualmente
+                            if (!idsEnUso.Contains(idMedicamento))
+                            {
+                                int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
+                                int tiempoAdministracion = Convert.ToInt32(row.Cells["Administracion"].Value);
+                                string efectoSecundario = row.Cells["Efecto_secundario"].Value?.ToString() ?? string.Empty;
+
+                                var datosTratamientoMedicamento = new Dictionary<string, object>
+                                {
+                                  { "id_tratamiento", tratamiento.id_tratamiento },
+                                  { "id_medicamento", idMedicamento },
+                                  { "cantidad", cantidad },
+                                  { "Uso_Actualmente", "SI" },
+                                  { "tiempo_administracion", tiempoAdministracion },
+                                  { "efecto_secundario", efectoSecundario }
+                                };
+
+                                dato.Insertar("tratamiento_medicamento", datosTratamientoMedicamento);
+                            }
+                            else if(IdExiste.Contains(idMedicamento))
+                            {
+                                var ActivarMedicamento = new Dictionary<string, object>
+                                {
+                                    {"Uso_Actualmente","SI" }
+                                };
+
+                                dato.ActualizarTablas("tratamiento_medicamento", ActivarMedicamento, "id_medicamento", idMedicamento);
+                            }
+
+                        }
+                    }
+
+                    foreach (int idMedicamentoEliminado in idsEliminados)
+                    {
+                        var datosTratamientoMedicamento2 = new Dictionary<string, object>
+                        {
+                          { "Uso_Actualmente", "NO" }
+                        };
+                        dato.ActualizarTablas("tratamiento_medicamento", datosTratamientoMedicamento2, "id_medicamento", idMedicamentoEliminado);
+                    }
+                }
+
+           
+            }
+            limpiar(); // Limpia los campos después de actualizar
+        }
 
         private void txtCurp_TextChanged(object sender, EventArgs e)
         {
@@ -298,19 +356,9 @@ namespace Proyecto_Integrador
 
                 txtCurp.Text = txtCurp.Text.Substring(0, 18); // Limita la CURP a 18 caracteres
             }
-            ValidarFormulario();
+   
 
         }
-
-        private void txtCausa_TextChanged(object sender, EventArgs e)
-        {
-            ValidarFormulario();
-
-        }
-
-
-
-
 
 
 
@@ -319,8 +367,7 @@ namespace Proyecto_Integrador
 
         }
 
-
-
+        // Evento para añadir los datos necesarios al DataGridView
         private void btnAgregar_Click(object sender, EventArgs e)
         {
             if (cmbMedicamentos.SelectedItem is Medicamento medicamentoElegido &&
@@ -343,6 +390,32 @@ namespace Proyecto_Integrador
 
             }
         }
+        // Evento para eliminar los datos seleccionados del DataGridView
+        private void btnEliminar_Click(object sender, EventArgs e)
+        {
+
+            if (dgvDatos.SelectedRows.Count > 0)
+            {
+                foreach (DataGridViewRow row in dgvDatos.SelectedRows)
+                {
+                    if (!row.IsNewRow)
+                    {
+                        int id = Convert.ToInt32(row.Cells["Id_medicamento"].Value);// Obtiene el ID eliminado del medicamento de la fila seleccionada
+                        idsEliminados.Add(id); // Agrega el ID a la lista de IDs eliminados
+                        dgvDatos.Rows.Remove(row);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Por favor, selecciona una fila para eliminar.");
+            }
+
+        }
+
+
+
+
 
         //SOLO ACEPTE LETRAS
 
@@ -421,45 +494,59 @@ namespace Proyecto_Integrador
         //VALIDAR PARA ACTIVAR EL BOTON
         private void txtNombres_TextChanged(object sender, EventArgs e)
         {
-            ValidarFormulario();
+           
         }
 
         private void txtApellidoMaterno_TextChanged(object sender, EventArgs e)
         {
-            ValidarFormulario();
+         
         }
 
         private void txtApellidoPaterno_TextChanged(object sender, EventArgs e)
         {
-            ValidarFormulario();
+           
         }
 
         private void txtEfectoSecundario_TextChanged(object sender, EventArgs e)
         {
-            ValidarFormulario();
+           
         }
 
 
         private void cmbMedico_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ValidarFormulario();
+          
         }
         private void cmbCausa_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ValidarFormulario();
+          
         }
 
         private void DgvDatos_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            ValidarFormulario();
+           
         }
 
         private void DgvDatos_RowsChanged(object sender, EventArgs e)
         {
-            ValidarFormulario();
+        
         }
 
-
+        private void limpiar()
+        {
+            txtNombres.Clear();
+            txtAdministracion.Clear();
+            txtApellidoMeterno.Clear();
+            txtApellidoPaterno.Clear();
+            txtCurp.Clear();
+            cmbMedicamentos.SelectedIndex = -1;//Regresa a una pocision anterior
+            txtAdministracion.Clear();//
+            txtCantidad.Clear();
+            txtEfectoSecundario.Clear();
+            dgvDatos.Rows.Clear(); // Limpia el DataGridView después de actualizar
+            btnActualizar.Visible = false; // Deshabilita el botón de actualizar después de guardar
+            guardarbtn.Visible = true;
+        }
 
 
 
@@ -496,40 +583,55 @@ namespace Proyecto_Integrador
         private void ValidarFormulario()
 
         {
+
+
+            Datos dato = new Datos();
+            string curp = txtCurp.Text;
+            int activo = dato.EstadoActual(curp);
+
             bool textBoxesLlenos = !string.IsNullOrWhiteSpace(txtNombres.Text) &&
-            !string.IsNullOrWhiteSpace(txtApellidoMeterno.Text) &&
-            !string.IsNullOrWhiteSpace(txtApellidoPaterno.Text) &&
-            !string.IsNullOrWhiteSpace(txtCurp.Text);
+                                   !string.IsNullOrWhiteSpace(txtApellidoMeterno.Text) &&
+                                   !string.IsNullOrWhiteSpace(txtApellidoPaterno.Text) &&
+                                   !string.IsNullOrWhiteSpace(txtCurp.Text);
 
             bool comboSeleccionados = cmbMedico.SelectedIndex > 0;
             bool comboCausa = cmbCausa.SelectedIndex > 0;
             bool dataGridConDatos = dgvDatos.Rows
-            .Cast<DataGridViewRow>()
-            .Any(row => !row.IsNewRow && row.Cells.Cast<DataGridViewCell>().Any(cell => cell.Value != null));
+                .Cast<DataGridViewRow>()
+                .Any(row => !row.IsNewRow && row.Cells.Cast<DataGridViewCell>().Any(cell => cell.Value != null));
 
-            guardarbtn.Enabled = textBoxesLlenos && comboSeleccionados && dataGridConDatos && comboCausa;
-            btnActualizar.Enabled = textBoxesLlenos && comboSeleccionados && dataGridConDatos && comboCausa;
-        }
-
-        private void btnEliminar_Click(object sender, EventArgs e)
-        {
-
-            if (dgvDatos.SelectedRows.Count > 0)
+            if (activo == 1)
             {
-                foreach (DataGridViewRow row in dgvDatos.SelectedRows)
+                // Paciente ya registrado: permitir actualizar aunque el DataGrid esté vacío
+                if (textBoxesLlenos && comboSeleccionados && comboCausa)
                 {
-                    if (!row.IsNewRow)
-                    {
-                        dgvDatos.Rows.Remove(row);
-                    }
+                    btnActualizar.Text = "Actualizar";
+                    btnActualizar.Enabled = true;
+                }
+                else
+                {
+                    btnActualizar.Enabled = false;
                 }
             }
             else
             {
-                MessageBox.Show("Por favor, selecciona una fila para eliminar.");
+                // Paciente nuevo: requerir todo lleno, incluyendo medicamentos
+                if (textBoxesLlenos && comboSeleccionados && comboCausa && dataGridConDatos)
+                {
+                    btnActualizar.Text = "Guardar";
+                    btnActualizar.Enabled = true;
+                }
+                else
+                {
+                    btnActualizar.Enabled = false;
+                }
             }
 
+            guardarbtn.Enabled = false;
+
         }
+
+
         // Función para permitir solo letras y números en el campo CURP
         private void txtCurp_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -538,6 +640,7 @@ namespace Proyecto_Integrador
                 e.Handled = true; // Cancela la entrada del carácter
             }
         }
+
     }
 
 }

@@ -12,8 +12,13 @@ using System.Windows.Forms;
 
 namespace Proyecto_Integrador
 {
+
+
     public partial class Verificacion : Form
     {
+        
+
+
 
         private Principal ContenidoPrincipal;
         public Verificacion(Principal principal)
@@ -23,7 +28,7 @@ namespace Proyecto_Integrador
             this.FormBorderStyle = FormBorderStyle.FixedSingle; // Evita que se pueda cambiar el tamaño
             this.MaximizeBox = false; // Desactiva el botón de maximizar
             this.MinimizeBox = false; // Desactiva el botón de minimizar
-            ContenidoPrincipal.panel.Enabled = false; // Desactiva el panel principal
+            ContenidoPrincipal.Panel.Enabled = false; // Desactiva el panel principal
 
         }
 
@@ -39,52 +44,129 @@ namespace Proyecto_Integrador
 
         private void btnVerificar_Click(object sender, EventArgs e)
         {
+
+
             string verificacion = txtVerificacion.Text;
             var clase = new Datos();
+            int estado = clase.EstadoActual(verificacion);
+            var DatoP = clase.ObtenerDatosPaciente(verificacion, estado);
+            var DatosE = clase.OBtenerEstancias(DatoP != null ? DatoP.id_Paciente : 0);
+            var DatosT = clase.ObtenerTratamiento(DatosE != null ? DatosE.Id : 0);
+            var DatosGrind = clase.ObtenertratamientoConMedicamentos(DatosT != null ? DatosT.id_tratamiento : 0);
 
-
-            var datoP = clase.ObtenerDatosPaciente(verificacion);
-            if (datoP == null)
+            if (estado == 1)
             {
-                MessageBox.Show("No se encontró ningún registro con esa CURP.");
-                ContenidoPrincipal.panel.Enabled = true; // Reactiva el panel principal
+                ContenidoPrincipal.Actualizar.Enabled = true;   
+                ContenidoPrincipal.Nombres.ReadOnly = true;
+                ContenidoPrincipal.Curp.ReadOnly = true;
+                ContenidoPrincipal.Apellido_paterno.ReadOnly = true;
+                ContenidoPrincipal.Apellido_materno.ReadOnly = true;
+                ContenidoPrincipal.Medico.DropDownStyle = ComboBoxStyle.Simple;
+                ContenidoPrincipal.Medico.Enabled = false;
+                ContenidoPrincipal.Causa.DropDownStyle = ComboBoxStyle.Simple;
+                ContenidoPrincipal.Causa.Enabled = false;
+
+                ContenidoPrincipal.Nombres.Text = DatoP.Nombres;
+                ContenidoPrincipal.Curp.Text = DatoP.Curp;
+                ContenidoPrincipal.Apellido_paterno.Text = DatoP.Apellido_Paterno;
+                ContenidoPrincipal.Apellido_materno.Text = DatoP.Apellido_Materno;
+
+                if (DatosT.estudio_clinico == 1)
+                {
+                    ContenidoPrincipal.RadioButton.Checked = true;
+                }
+                else
+                {
+                    ContenidoPrincipal.RadioButton.Checked = false;
+                }
+
+                foreach (var item in DatosGrind)
+                {
+                    ContenidoPrincipal.Dgvdatos.Rows.Add(item.id_medicamento, item.Medicamento, item.tiempoAdministracion, item.cantidad, item.Efecto_secundario);
+                }
+
+                ContenidoPrincipal.Guardar.Hide();
+                ContenidoPrincipal.Actualizar.Show();
+                ContenidoPrincipal.Panel.Enabled = true;
                 this.Close();
             }
             else
             {
-                var datosE = clase.OBtenerEstancias(datoP.id_Paciente);
-                var datosT = clase.ObtenerTratamiento(datosE.Id);
-                var datosGrind = clase.ObtenertratamientoConMedicamentos(datosT.id_tratamiento);
+                if (DatoP == null)
 
-                ContenidoPrincipal.txtnombres.Text = datoP.Nombres;
-                ContenidoPrincipal.txtcurp.Text = datoP.Curp;
-                ContenidoPrincipal.txtapellido_paterno.Text = datoP.Apellido_Paterno;
-                ContenidoPrincipal.apellido_materno.Text = datoP.Apellido_Materno;
-                if (datosT.estudio_clinico == 1)
                 {
-                    ContenidoPrincipal.radioButton.Checked = true;
+
+                    // Habilitar campos para registrar nuevo paciente
+                    ContenidoPrincipal.Panel.Enabled = true;
+                    ContenidoPrincipal.Nombres.ReadOnly = false;
+                    ContenidoPrincipal.Curp.ReadOnly = false;
+                    ContenidoPrincipal.Apellido_paterno.ReadOnly = false;
+                    ContenidoPrincipal.Apellido_materno.ReadOnly = false;
+                    ContenidoPrincipal.Medico.DropDownStyle = ComboBoxStyle.DropDown;
+                    ContenidoPrincipal.Medico.Enabled = true;
+                    ContenidoPrincipal.Causa.DropDownStyle = ComboBoxStyle.DropDown;
+                    ContenidoPrincipal.Causa.Enabled = true;
+
+                    ContenidoPrincipal.Nombres.Text = "";
+                    ContenidoPrincipal.Curp.Text = verificacion; // Puedes dejar la CURP ya escrita
+                    ContenidoPrincipal.Apellido_paterno.Text = "";
+                    ContenidoPrincipal.Apellido_materno.Text = "";
+                    ContenidoPrincipal.Dgvdatos.Rows.Clear();
+                    ContenidoPrincipal.RadioButton.Checked = false;
+
+                    ContenidoPrincipal.Guardar.Show();
+                    ContenidoPrincipal.Actualizar.Hide();
+                    ContenidoPrincipal.Actualizar.Enabled=true;
+                    this.Close();
+                }
+                else if (DatosGrind.Count == 0)
+                {
+                    MessageBox.Show("No se encontraron datos registrados.");
+
+                    ContenidoPrincipal.Panel.Enabled = true;
+                    ContenidoPrincipal.Nombres.Text = "";
+                    ContenidoPrincipal.Curp.Text = "";
+                    ContenidoPrincipal.Apellido_paterno.Text = "";
+                    ContenidoPrincipal.Apellido_materno.Text = "";
+                    ContenidoPrincipal.Dgvdatos.Rows.Clear();
+                    ContenidoPrincipal.RadioButton.Checked = false;
+                    this.Close();
                 }
                 else
                 {
-                    ContenidoPrincipal.radioButton.Checked = false;
+                    ContenidoPrincipal.Nombres.Text = DatoP.Nombres;
+                    ContenidoPrincipal.Curp.Text = DatoP.Curp;
+                    ContenidoPrincipal.Apellido_paterno.Text = DatoP.Apellido_Paterno;
+                    ContenidoPrincipal.Apellido_materno.Text = DatoP.Apellido_Materno;
+
+                    if (DatosT.estudio_clinico == 1)
+                    {
+                        ContenidoPrincipal.RadioButton.Checked = true;
+                    }
+                    else
+                    {
+                        ContenidoPrincipal.RadioButton.Checked = false;
+                    }
+
+                    foreach (var item in DatosGrind)
+                    {
+                        ContenidoPrincipal.Dgvdatos.Rows.Add(item.id_medicamento, item.Medicamento, item.tiempoAdministracion, item.cantidad, item.Efecto_secundario);
+                    }
+
+                    ContenidoPrincipal.Guardar.Hide();
+                    ContenidoPrincipal.Actualizar.Show();
+                    ContenidoPrincipal.Panel.Enabled = true;
+                    this.Close();
                 }
-
-                foreach (var item in datosGrind)
-                {
-
-                    ContenidoPrincipal.dgvdatos.Rows.Add(item.id_medicaemto, item.Medicamento, item.tiempoAdministracion, item.cantidad, item.Efecto_secundario);
-                }
-
-                ContenidoPrincipal.guardar.Hide();
-                ContenidoPrincipal.Actualiar.Show();
-                ContenidoPrincipal.panel.Enabled = true; // Reactiva el panel principal
-                this.Close();
             }
-
-
         }
 
+        
+
+
+        // Limita la longitud de la CURP a 18 caracteres
         private void txtVerificacion_TextChanged(object sender, EventArgs e)
+      
         {
             int longitud = txtVerificacion.Text.Length;
             if (longitud > 18)
@@ -95,6 +177,8 @@ namespace Proyecto_Integrador
 
         }
 
+
+        // Permite solo letras y números en la CURP
         private void txtVerificacion_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsLetterOrDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
