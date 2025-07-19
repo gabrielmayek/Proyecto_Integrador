@@ -61,7 +61,6 @@ namespace Proyecto_Integrador.Data
                 Console.WriteLine("No se proporcionaron datos para actualizar.");
                 return;
             }
-
             var lista = new List<string>();
             foreach (var dato in datos)
             {
@@ -69,18 +68,14 @@ namespace Proyecto_Integrador.Data
             }
             string columnas = string.Join(", ", lista);
             string consulta = $"UPDATE {tabla} SET {columnas} WHERE {condicion} = @{condicion}";
-
             using (MySqlConnection conexion = new MySqlConnection(CadenaConexion))
             {
                 MySqlCommand comando = new MySqlCommand(consulta, conexion);
-
                 foreach (var dato in datos)
                 {
                     comando.Parameters.AddWithValue("@" + dato.Key, dato.Value);
                 }
-
                 comando.Parameters.AddWithValue("@" + condicion, id_necesario);
-
                 try
                 {
                     conexion.Open();
@@ -89,6 +84,39 @@ namespace Proyecto_Integrador.Data
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error al actualizar {ex.Message}");
+                }
+            }
+        }
+
+
+        public void ActualizarTablasConMasCondiciones(string tabla, Dictionary<string, object> valoresActualizar, Dictionary<string, object> condiciones)
+        {
+            using (MySqlConnection conexion = new MySqlConnection(CadenaConexion))
+            {
+                conexion.Open();
+
+                // Construir SET
+                var setClause = string.Join(", ", valoresActualizar.Select(kv => $"{kv.Key} = @{kv.Key}"));
+                // Construir WHERE
+                var whereClause = string.Join(" AND ", condiciones.Select(kv => $"{kv.Key} = @cond_{kv.Key}"));
+
+                string query = $"UPDATE {tabla} SET {setClause} WHERE {whereClause}";
+
+                using (MySqlCommand comando = new MySqlCommand(query, conexion))
+                {
+                    // Parámetros para SET
+                    foreach (var kv in valoresActualizar)
+                    {
+                        comando.Parameters.AddWithValue($"@{kv.Key}", kv.Value ?? DBNull.Value);
+                    }
+
+                    // Parámetros para WHERE
+                    foreach (var kv in condiciones)
+                    {
+                        comando.Parameters.AddWithValue($"@cond_{kv.Key}", kv.Value ?? DBNull.Value);
+                    }
+
+                    comando.ExecuteNonQuery();
                 }
             }
         }
@@ -216,7 +244,7 @@ namespace Proyecto_Integrador.Data
         // Método para obtener el ID de un paciente inactivo por su CURP
         public int id_inactivo(string curp)//
         {
-            int id_obtenido = 0;
+            int id_obtenido;
             string query = $"select id_Paciente from paciente where estado_actual = 0 and curp='{curp}'";
             using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
             {
@@ -239,7 +267,7 @@ namespace Proyecto_Integrador.Data
         // Método para obtener el estado actual de un paciente por su CURP
         public int EstadoActual(string curp)//
         {
-            int id_obtenido = 0;
+          
             string query = $"select estado_actual from paciente where curp='{curp}'";
             using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
             {
@@ -247,7 +275,13 @@ namespace Proyecto_Integrador.Data
                 try
                 {
                     connection.Open();
-                    id_obtenido = Convert.ToInt32(commandos.ExecuteScalar());
+                    object id_obtenido = commandos.ExecuteScalar();
+                    if (id_obtenido == null || id_obtenido == DBNull.Value)
+                    {
+                        // CURP no encontrado: paciente nuevo
+                        return -1;
+                    }
+                    return Convert.ToInt32(id_obtenido);
                     // ExecuteScalar es un método que ejecuta la consulta y devuelve el primer valor de la primera fila del resultado
                 }
                 catch (Exception ex)
@@ -255,9 +289,11 @@ namespace Proyecto_Integrador.Data
                     MessageBox.Show("Error al conectar 1", ex.Message);
                     return -1;
                 }
-                return Convert.ToInt32(id_obtenido);
             }
         }
+
+
+
         // Método para obtener el CURP de un paciente inactivo por su ID
         public string curp_inactivo(int id)//
         {
@@ -330,7 +366,7 @@ namespace Proyecto_Integrador.Data
             return datos;
         }
         // Método para obtener la última estancia de un paciente por su ID
-        public Estancias OBtenerEstancias(int id)
+        public Estancias ObtenerEstancias(int id)
         {
             Estancias estancias = null;
             using (var connection = new MySqlConnection(CadenaConexion))
@@ -364,7 +400,7 @@ namespace Proyecto_Integrador.Data
         // Método para obtener el tratamiento asociado a una estancia por su ID
         public Tratamiento ObtenerTratamiento(int id)
         {
-            Tratamiento datos = null;
+            Tratamiento datos =null;
 
             using (var connection = new MySqlConnection(CadenaConexion))
             {
@@ -425,7 +461,7 @@ namespace Proyecto_Integrador.Data
                 }
 
                 // Obtener datos del tratamiento  haciendo relacion con la tabla medicamentos para los nombres
-                using (var cmd = new MySqlCommand($"SELECT * from tratamiento_medicamento where id_tratamiento = {id} and Uso_Actualmente = 'SI' ", conn))
+                using (var cmd = new MySqlCommand($"SELECT * from tratamiento_medicamento where id_tratamiento = {id}", conn))
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -451,6 +487,28 @@ namespace Proyecto_Integrador.Data
 
             return tratamientos;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         // Método para verificar si un paciente tiene una estancia activa

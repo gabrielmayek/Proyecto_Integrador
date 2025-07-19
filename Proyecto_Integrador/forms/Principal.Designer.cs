@@ -250,7 +250,7 @@ namespace Proyecto_Integrador
             btnActualizar.BackColor = Color.FromArgb(177, 232, 134);
             btnActualizar.FlatStyle = FlatStyle.Flat;
             btnActualizar.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnActualizar.Location = new Point(562, 1320);
+            btnActualizar.Location = new Point(499, 1321);
             btnActualizar.Name = "btnActualizar";
             btnActualizar.Size = new Size(218, 46);
             btnActualizar.TabIndex = 16;
@@ -317,7 +317,7 @@ namespace Proyecto_Integrador
             // 
             cmbMedico.Font = new Font("Verdana", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             cmbMedico.FormattingEnabled = true;
-            cmbMedico.Location = new Point(32, 1339);
+            cmbMedico.Location = new Point(6, 1328);
             cmbMedico.Name = "cmbMedico";
             cmbMedico.Size = new Size(487, 33);
             cmbMedico.TabIndex = 15;
@@ -397,7 +397,7 @@ namespace Proyecto_Integrador
             label12.AutoSize = true;
             label12.Font = new Font("Verdana", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label12.ForeColor = Color.White;
-            label12.Location = new Point(41, 1312);
+            label12.Location = new Point(32, 1253);
             label12.Name = "label12";
             label12.Size = new Size(91, 28);
             label12.TabIndex = 1;

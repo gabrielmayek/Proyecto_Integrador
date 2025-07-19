@@ -50,12 +50,13 @@ namespace Proyecto_Integrador
             var clase = new Datos();
             int estado = clase.EstadoActual(verificacion);
             var DatoP = clase.ObtenerDatosPaciente(verificacion, estado);
-            var DatosE = clase.OBtenerEstancias(DatoP != null ? DatoP.id_Paciente : 0);
+            var DatosE = clase.ObtenerEstancias(DatoP != null ? DatoP.id_Paciente : 0);
             var DatosT = clase.ObtenerTratamiento(DatosE != null ? DatosE.Id : 0);
             var DatosGrind = clase.ObtenertratamientoConMedicamentos(DatosT != null ? DatosT.id_tratamiento : 0);
 
             if (estado == 1)
             {
+                MessageBox.Show("Se encontraron datos registrados.");
                 ContenidoPrincipal.Actualizar.Enabled = true;   
                 ContenidoPrincipal.Nombres.ReadOnly = true;
                 ContenidoPrincipal.Curp.ReadOnly = true;
@@ -80,7 +81,7 @@ namespace Proyecto_Integrador
                     ContenidoPrincipal.RadioButton.Checked = false;
                 }
 
-                foreach (var item in DatosGrind)
+                foreach (var item in DatosGrind.Where(m => m.UsoActualmente == "SI"))
                 {
                     ContenidoPrincipal.Dgvdatos.Rows.Add(item.id_medicamento, item.Medicamento, item.tiempoAdministracion, item.cantidad, item.Efecto_secundario);
                 }
@@ -95,6 +96,7 @@ namespace Proyecto_Integrador
                 if (DatoP == null)
 
                 {
+                    MessageBox.Show("No se encontraron datos registrados.");
 
                     // Habilitar campos para registrar nuevo paciente
                     ContenidoPrincipal.Panel.Enabled = true;
@@ -134,6 +136,7 @@ namespace Proyecto_Integrador
                 }
                 else
                 {
+                    MessageBox.Show("Se encontraron datos registrados.");
                     ContenidoPrincipal.Nombres.Text = DatoP.Nombres;
                     ContenidoPrincipal.Curp.Text = DatoP.Curp;
                     ContenidoPrincipal.Apellido_paterno.Text = DatoP.Apellido_Paterno;
@@ -171,7 +174,7 @@ namespace Proyecto_Integrador
             int longitud = txtVerificacion.Text.Length;
             if (longitud > 18)
             {
-                MessageBox.Show("La CURP no puede estar vacia y debe tener más de 18 caracteres.");
+                MessageBox.Show("La CURP no puede tener más de 18 caracteres.");
                 txtVerificacion.Text = txtVerificacion.Text.Substring(0, 18); // Limita la CURP a 18 caracteres
             }
 

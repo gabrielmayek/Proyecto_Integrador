@@ -8,6 +8,7 @@ namespace Proyecto_Integrador.Models
 {
     internal class Tratamiento_medicamento
     {
+        public int id_tratamiento_medicamento { get; set; }
         public int id_tratamiento {  get; set; }
 
         public int id_medicamento { get; set; }
