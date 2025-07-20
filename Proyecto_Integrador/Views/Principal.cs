@@ -25,7 +25,9 @@ namespace Proyecto_Integrador
         public System.Windows.Forms.Button Actualizar => btnActualizar;
         public System.Windows.Forms.Panel Panel => panelRegistrar;
 
+
         private PacienteActivoControl pacienteControl;
+
 
 
         public Principal()
@@ -50,16 +52,16 @@ namespace Proyecto_Integrador
             guardarbtn.Enabled = false; // Deshabilita el botón de guardar al inicio
             btnActualizar.Enabled = false;
             List<string> tipos = new List<string> { "mL", "L", "µL", "cc", "gota", "cdita", "cda", "mg", "g", "kg", "mcg", "ng", "UI", "U", "mEq", "mol", "mmol", "UFC" };
-            cmbTipo.DataSource = tipos;
+            cmbTipo.DataSource = tipos;// Carga los tipos de unidades en el ComboBox
 
-            pacienteControl = new PacienteActivoControl();
-            pacienteControl.Dock = DockStyle.Fill;
+            pacienteControl = new PacienteActivoControl();// Crea una instancia del control de paciente activo
+            pacienteControl.Dock = DockStyle.Fill;// Asegura que el control ocupe todo el espacio disponible en su contenedor
 
         }
-
+        // Panel para mostrar los pacientes activos
         private FlowLayoutPanel flowLayoutPanelActivos;
 
-
+        // Método para inicializar el panel de pacientes activos
         private void InitializeActivosPanel()
         {
             flowLayoutPanelActivos = new FlowLayoutPanel
@@ -72,12 +74,20 @@ namespace Proyecto_Integrador
             Activos.Controls.Add(flowLayoutPanelActivos); // <-- Cambia aqu�
         }
 
-
+        // Método para cargar los pacientes activos en el panel
         private void CargarPacientesActivos()
         {
-            flowLayoutPanelActivos.Controls.Clear();
-            var datos = new Datos();
+            foreach (Control ctrl in flowLayoutPanelActivos.Controls)
+            {
+                if (ctrl is PacienteActivoControl pacCtrl)
+                {
+                    pacCtrl.GuardarEstado();
+                }
+            }
 
+            flowLayoutPanelActivos.Controls.Clear();
+
+            var datos = new Datos();
             var pacientes = datos.ObtenerPacientesActivos();
 
             foreach (var paciente in pacientes)
@@ -104,8 +114,6 @@ namespace Proyecto_Integrador
                             m => TimeSpan.FromHours(m.tiempoAdministracion)
                         );
 
-                    // Ya no necesitas cargar el estado aquí, eso lo hace el UserControl internamente
-
                     var pacienteControl = new PacienteActivoControl();
                     pacienteControl.SetPacienteInfo(
                         paciente.id_Paciente,
@@ -124,6 +132,7 @@ namespace Proyecto_Integrador
                 }
             }
         }
+
 
 
 
@@ -152,22 +161,22 @@ namespace Proyecto_Integrador
             dgvDatos.Columns.Add("Nombre", "Medicamento");
             dgvDatos.Columns.Add("Administracion", "Administración (horas)");
             dgvDatos.Columns.Add("Cantidad", "Cantidad");
+            dgvDatos.Columns.Add("Unidad","Unidad");
             dgvDatos.Columns.Add("Efecto_secundario", "Efecto Secundario");
             dgvDatos.Columns["Administracion"].Width = 200; // Ajusta el ancho de la columna de administración
-            dgvDatos.Columns["Cantidad"].Width = 246; // Ajusta el ancho de la columna de cantidad
+            dgvDatos.Columns["Cantidad"].Width = 150; // Ajusta el ancho de la columna de cantidad
             dgvDatos.Columns["Nombre"].Width = 400; // Ajusta el ancho de la columna de nombre
             dgvDatos.Columns["Efecto_secundario"].Width = 200; // Ajusta el ancho de la columna de efecto secundario
+            dgvDatos.Columns["Unidad"].Width = 100; // Ajusta el ancho de la columna de unidad
             dtimeEntrada.Value = DateTime.Now; //Actualiza la hora al dia de hoy
 
         }
 
         private void btnRegistar_Click(object sender, EventArgs e)
         {
-
             tabControlMenu.SelectedTab = Registar; // Cambia a la pestaña de registro
             Form Verificar = new Verificacion(this); // Crea una instancia del formulario de verificación
             Verificar.Show();
-
 
         }
 
@@ -249,7 +258,9 @@ namespace Proyecto_Integrador
                     int idMedicamento = Convert.ToInt32(row.Cells["Id_medicamento"].Value);
                     int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
                     int tiempoAdministracion = Convert.ToInt32(row.Cells["Administracion"].Value);
+                    string unidad = row.Cells["Unidad"].Value?.ToString() ?? string.Empty;
                     string efectoSecundario = row.Cells["Efecto_secundario"].Value?.ToString() ?? string.Empty;
+                
 
                     Dictionary<string, object> datosTratamientoMedicamento = new Dictionary<string, object>
 
@@ -258,6 +269,7 @@ namespace Proyecto_Integrador
                         { "id_medicamento", idMedicamento },
                         {"Uso_Actualmente","SI" },
                         { "cantidad", cantidad },
+                         {"unidad",unidad },
                         { "tiempo_administracion", tiempoAdministracion },
                         {"efecto_secundario", efectoSecundario },
 
@@ -333,24 +345,29 @@ namespace Proyecto_Integrador
                             int idMedicamento = Convert.ToInt32(row.Cells["Id_medicamento"].Value);
                             int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
                             int tiempoAdministracion = Convert.ToInt32(row.Cells["Administracion"].Value);
+                            string unidad = row.Cells["Unidad"].Value?.ToString() ?? string.Empty;
                             string efectoSecundario = row.Cells["Efecto_secundario"].Value?.ToString() ?? string.Empty;
-
+                          
                             Dictionary<string, object> datosTratamientoMedicamento = new Dictionary<string, object>
 
                    {
-                        {"id_tratamiento",id_tratamiento },
-                        { "id_medicamento", idMedicamento },
-                        { "cantidad", cantidad },
-                        {"Uso_Actualmente" ,"SI"},
-                        { "tiempo_administracion", tiempoAdministracion },
-                        {"efecto_secundario", efectoSecundario },
-
+                            {"id_tratamiento",id_tratamiento },
+                            { "id_medicamento", idMedicamento },
+                            {"Uso_Actualmente","SI" },
+                            { "cantidad", cantidad },
+                            {"unidad",unidad },
+                            { "tiempo_administracion", tiempoAdministracion },
+                            {"efecto_secundario", efectoSecundario },
                    };
 
                             dato.Insertar("tratamiento_medicamento", datosTratamientoMedicamento);
                         }
                     }
                 }
+
+
+                
+
 
             }
             else
@@ -384,7 +401,9 @@ namespace Proyecto_Integrador
                             int idMedicamento = Convert.ToInt32(row.Cells["Id_medicamento"].Value);
                             int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
                             int tiempoAdministracion = Convert.ToInt32(row.Cells["Administracion"].Value);
+                            string unidad = row.Cells["Unidad"].Value?.ToString() ?? string.Empty;
                             string efectoSecundario = row.Cells["Efecto_secundario"].Value?.ToString() ?? string.Empty;
+                   
                             bool estaEnUso = idsEnUso.Contains(idMedicamento);
 
                             bool existeInactivo = UsoActualmente.Any(m => m.id_medicamento == idMedicamento && m.UsoActualmente == "NO");
@@ -420,6 +439,7 @@ namespace Proyecto_Integrador
                                     { "id_medicamento", idMedicamento },
                                     { "cantidad", cantidad },
                                     { "Uso_Actualmente", "SI" },
+                                    {"unidad",unidad },
                                     { "tiempo_administracion", tiempoAdministracion },
                                     { "efecto_secundario", efectoSecundario }
                                 };
@@ -436,7 +456,12 @@ namespace Proyecto_Integrador
 
 
             }
+
+
             limpiar();
+
+
+
 
         }
 
@@ -469,8 +494,8 @@ namespace Proyecto_Integrador
              int.TryParse(txtCantidad.Text, out int cantidad))
             {
                 string secundario = txtEfectoSecundario.Text;
-
-                _ = dgvDatos.Rows.Add(medicamentoElegido.Id, medicamentoElegido.Nombre, administracion, cantidad, secundario);
+                string unidad = cmbTipo.SelectedItem?.ToString() ?? "Otra Unidad"; // Obtiene la unidad seleccionada o usa "mL" por defecto
+                _ = dgvDatos.Rows.Add(medicamentoElegido.Id, medicamentoElegido.Nombre, administracion, cantidad,unidad, secundario);
                 //_ sirve para ignorar el valor de retorno del método Rows.Add
                 cmbMedicamentos.SelectedIndex = -1;//Regresa a una pocision anterior
                 txtAdministracion.Clear();//
@@ -722,6 +747,7 @@ namespace Proyecto_Integrador
         // Función para validar el formulario de pacientes inactivos
         private void ValidarFormularioPacienteInactivo()
         {
+            btnActualizar.Text = "Guardar";
             bool textBoxesLlenos = !string.IsNullOrWhiteSpace(txtNombres.Text) &&
                                    !string.IsNullOrWhiteSpace(txtApellidoMeterno.Text) &&
                                    !string.IsNullOrWhiteSpace(txtApellidoPaterno.Text) &&
@@ -735,7 +761,7 @@ namespace Proyecto_Integrador
 
             if (textBoxesLlenos && comboSeleccionados && comboCausa && dataGridConDatos)
             {
-                btnActualizar.Text = "Guardar";
+               
                 btnActualizar.Enabled = true;
             }
             else

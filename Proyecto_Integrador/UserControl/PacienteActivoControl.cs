@@ -1,4 +1,5 @@
 ﻿using Proyecto_Integrador.Models;
+using Proyecto_Integrador.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,8 +20,8 @@ namespace Proyecto_Integrador
         private int idPaciente;
         private string rutaEstado;
         private System.Windows.Forms.Timer timer;
-        private Dictionary<string, TimeSpan> tiemposRestantes;
-        private Dictionary<string, TimeSpan> tiemposOriginales;
+        public Dictionary<string, TimeSpan> tiemposRestantes;
+        public Dictionary<string, TimeSpan> tiemposOriginales;
         private List<Label> labelsTiempos = new List<Label>();
 
         public PacienteActivoControl()
@@ -42,23 +43,31 @@ namespace Proyecto_Integrador
             idPaciente = id;
             rutaEstado = ObtenerRutaEstado(idPaciente);
 
+            // Cargar estado guardado (ajustado con el tiempo transcurrido)
             var estadoCargado = CargarEstado();
 
-            tiemposRestantes = new Dictionary<string, TimeSpan>(medicamentos);
+            // Inicializar los diccionarios
+            tiemposOriginales = new Dictionary<string, TimeSpan>(medicamentos);
+            tiemposRestantes = estadoCargado ?? new Dictionary<string, TimeSpan>(medicamentos);
 
             if (estadoCargado != null)
             {
-                foreach (var kvp in estadoCargado)
+                tiemposRestantes = new Dictionary<string, TimeSpan>(estadoCargado);
+
+                foreach (var med in medicamentos)
                 {
-                    if (tiemposRestantes.ContainsKey(kvp.Key))
+                    if (!tiemposRestantes.ContainsKey(med.Key))
                     {
-                        tiemposRestantes[kvp.Key] = kvp.Value;
+                        tiemposRestantes[med.Key] = med.Value;
                     }
                 }
             }
+            else
+            {
+                tiemposRestantes = new Dictionary<string, TimeSpan>(medicamentos);
+            }
 
-            tiemposOriginales = new Dictionary<string, TimeSpan>(medicamentos);
-
+            // Limpiar y reconstruir la interfaz
             labelsTiempos.Clear();
             flpVariable.Controls.Clear();
 
@@ -130,14 +139,54 @@ namespace Proyecto_Integrador
 
                 labelsTiempos[i].Text = tiemposRestantes[key].ToString(@"hh\:mm\:ss");
 
-                if (tiemposRestantes[key] <= TimeSpan.FromMinutes(5))
-                    labelsTiempos[i].BackColor = Color.Red;
-                else if (tiemposRestantes[key] <= TimeSpan.FromMinutes(15))
-                    labelsTiempos[i].BackColor = Color.Yellow;
+                // Colores base
+                Color verde = Color.FromArgb(0x7F, 0xDF, 0x5E);
+                Color amarillo = Color.FromArgb(0xDF, 0xD9, 0x5E);
+                Color rojo = Color.FromArgb(0xDF, 0x6B, 0x5E);
+
+                TimeSpan total = tiemposOriginales[key];
+                TimeSpan restante = tiemposRestantes[key];
+                double porcentaje = 1.0 - (restante.TotalSeconds / total.TotalSeconds);
+
+                Color color;
+
+                if (porcentaje < 1.0 / 3.0)
+                {
+                    double p = porcentaje / (1.0 / 3.0);
+                    color = InterpolarColor(verde, amarillo, p);
+                }
+                else if (porcentaje < 2.0 / 3.0)
+                {
+                    double p = (porcentaje - 1.0 / 3.0) / (1.0 / 3.0);
+                    color = InterpolarColor(amarillo, rojo, p);
+                }
                 else
-                    labelsTiempos[i].BackColor = Color.LightGreen;
+                {
+                    color = rojo;
+                }
+
+                // Parpadeo si quedan 5 minutos o menos
+                if (restante <= TimeSpan.FromMinutes(5))
+                {
+                    if (DateTime.Now.Second % 2 == 0)
+                        color = rojo;
+                    else
+                        color = Color.White;
+                }
+
+                labelsTiempos[i].BackColor = color;
             }
         }
+
+        // Función para interpolar colores
+        private Color InterpolarColor(Color inicio, Color fin, double porcentaje)
+        {
+            int r = (int)(inicio.R + (fin.R - inicio.R) * porcentaje);
+            int g = (int)(inicio.G + (fin.G - inicio.G) * porcentaje);
+            int b = (int)(inicio.B + (fin.B - inicio.B) * porcentaje);
+            return Color.FromArgb(r, g, b);
+        }
+
 
         private string ObtenerRutaEstado(int id)
         {
@@ -190,7 +239,26 @@ namespace Proyecto_Integrador
 
         private void btnDarDeAlta_Click(object sender, EventArgs e)
         {
+            Datos datos = new Datos();
+            DateTime fechaSalida = DateTime.Now;
             MessageBox.Show($"Paciente {lblNombres.Text.Replace("Nombres: ", "")} dado de alta.");
+            Dictionary<string,object> Alta = new Dictionary<string, object>
+            {
+                { "estado_actual", 0 }
+            };
+            datos.ActualizarTablas("paciente", Alta,"id_Paciente",idPaciente);
+            Dictionary<string, object> Condicion = new Dictionary<string, object>
+            {
+                { "id_paciente", idPaciente },
+                {"fecha_salida","2000-01-01 00:00:00" }
+
+            };
+
+            Dictionary<string, object> FechaSalida = new Dictionary<string, object>
+            {
+                { "fecha_salida", fechaSalida}
+            };
+            datos.ActualizarTablasConMasCondiciones( "estancias",FechaSalida,Condicion);
             this.Parent.Controls.Remove(this);
         }
 

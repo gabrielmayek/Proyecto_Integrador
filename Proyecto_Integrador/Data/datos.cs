@@ -54,7 +54,7 @@ namespace Proyecto_Integrador.Data
             }
         }
 
-        public void ActualizarTablas(string tabla, Dictionary<string, object> datos, string condicion, int id_necesario)
+        public void ActualizarTablas(string tabla, Dictionary<string, object> datos, string condicion, object necesario)
         {
             if (datos == null || datos.Count == 0)
             {
@@ -75,7 +75,7 @@ namespace Proyecto_Integrador.Data
                 {
                     comando.Parameters.AddWithValue("@" + dato.Key, dato.Value);
                 }
-                comando.Parameters.AddWithValue("@" + condicion, id_necesario);
+                comando.Parameters.AddWithValue("@" + condicion, necesario);
                 try
                 {
                     conexion.Open();
