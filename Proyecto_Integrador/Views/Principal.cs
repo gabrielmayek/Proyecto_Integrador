@@ -33,7 +33,7 @@ namespace Proyecto_Integrador
 
             InitializeComponent();
             InitializeActivosPanel(); // Inicializa el panel de pacientes activos
-       
+            CargarPacientesActivos(); // Carga los pacientes activos al iniciar el formulario
             var datos = new Datos(); // Crea una instancia de la clase datos
             datos.CargarComboMedicamentos(cmbMedicamentos); //Llama al método para cargar los medicamentos en el ComboBox
             datos.CargarComboMedicos(cmbMedico); // Llama al método para cargar los médicos en el ComboBox
@@ -72,58 +72,59 @@ namespace Proyecto_Integrador
             Activos.Controls.Add(flowLayoutPanelActivos); // <-- Cambia aqu�
         }
 
+
         private void CargarPacientesActivos()
         {
             flowLayoutPanelActivos.Controls.Clear();
-
             var datos = new Datos();
+
             var pacientes = datos.ObtenerPacientesActivos();
 
             foreach (var paciente in pacientes)
             {
-                // 1. Obtener la �ltima estancia activa
-                var estancia = datos.ObtenerEstancias(paciente.id_Paciente);
-                if (estancia == null) continue;
-
-                // 2. Obtener la fecha de entrada
-
-
-                var FechaEntrada = datos.ObtenerFechaEntrada(estancia.Id);
-
-
-                // 3. Calcular d�as internado
-                int diasInternado = (DateTime.Now - FechaEntrada).Days;
-
-                // 4. Obtener tratamiento
-                var tratamiento = datos.ObtenerTratamiento(estancia.Id);
-                if (tratamiento == null) continue;
-
-                // 5. Obtener medicamentos reales
-                var medicamentos = datos.ObtenertratamientoConMedicamentos(tratamiento.id_tratamiento);
-
-                // 6. Preparar diccionario para el control visual
-                var medsDict = new Dictionary<string, TimeSpan>();
-                foreach (var med in medicamentos.Where(m => m.UsoActualmente == "SI"))
+                try
                 {
-                    string nombre = med.Medicamento?.Nombre ?? "Medicamento";
-                    // Si tienes tiempo de administraci�n, �salo. Si no, pon TimeSpan.Zero
-                    TimeSpan tiempo = TimeSpan.FromHours(med.tiempoAdministracion);
-                    medsDict[nombre] = tiempo;
-                }
+                    var estancia = datos.ObtenerEstancias(paciente.id_Paciente);
+                    if (estancia == null) continue;
 
-                // 7. Mostrar en el control visual
-                var pacienteControl = new PacienteActivoControl();
-                pacienteControl.SetPacienteInfo(
-                    paciente.id_Paciente,
-                    paciente.Nombres,
-                    paciente.Apellido_Paterno,
-                    paciente.Apellido_Materno,
-                    diasInternado,
-                    medsDict
-                );
-                flowLayoutPanelActivos.Controls.Add(pacienteControl);
+                    var fechaEntrada = datos.ObtenerFechaEntrada(estancia.Id);
+                    if (fechaEntrada == DateTime.MinValue) continue;
+
+                    int diasInternado = (DateTime.Now - fechaEntrada).Days;
+
+                    var tratamiento = datos.ObtenerTratamiento(estancia.Id);
+                    if (tratamiento == null) continue;
+
+                    var medicamentos = datos.ObtenertratamientoConMedicamentos(tratamiento.id_tratamiento);
+
+                    var medsDict = medicamentos
+                        .Where(m => m.UsoActualmente == "SI")
+                        .ToDictionary(
+                            m => m.Medicamento?.Nombre ?? "Medicamento",
+                            m => TimeSpan.FromHours(m.tiempoAdministracion)
+                        );
+
+                    // Ya no necesitas cargar el estado aquí, eso lo hace el UserControl internamente
+
+                    var pacienteControl = new PacienteActivoControl();
+                    pacienteControl.SetPacienteInfo(
+                        paciente.id_Paciente,
+                        paciente.Nombres,
+                        paciente.Apellido_Paterno,
+                        paciente.Apellido_Materno,
+                        diasInternado,
+                        medsDict
+                    );
+
+                    flowLayoutPanelActivos.Controls.Add(pacienteControl);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al cargar paciente {paciente.id_Paciente}: {ex.Message}");
+                }
             }
         }
+
 
 
 
