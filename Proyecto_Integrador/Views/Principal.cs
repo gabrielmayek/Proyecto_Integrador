@@ -1,4 +1,4 @@
-
+ï»¿
 using Proyecto_Integrador.Data;
 using Proyecto_Integrador.Models;
 using System;
@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Text.Json;
 namespace Proyecto_Integrador
 {
     public partial class Principal : Form
@@ -24,14 +25,18 @@ namespace Proyecto_Integrador
         public System.Windows.Forms.Button Actualizar => btnActualizar;
         public System.Windows.Forms.Panel Panel => panelRegistrar;
 
+        private PacienteActivoControl pacienteControl;
+
 
         public Principal()
         {
 
             InitializeComponent();
+            InitializeActivosPanel(); // Inicializa el panel de pacientes activos
+       
             var datos = new Datos(); // Crea una instancia de la clase datos
-            datos.CargarComboMedicamentos(cmbMedicamentos); //Llama al método para cargar los medicamentos en el ComboBox
-            datos.CargarComboMedicos(cmbMedico); // Llama al método para cargar los médicos en el ComboBox
+            datos.CargarComboMedicamentos(cmbMedicamentos); //Llama al mÃ©todo para cargar los medicamentos en el ComboBox
+            datos.CargarComboMedicos(cmbMedico); // Llama al mÃ©todo para cargar los mÃ©dicos en el ComboBox
             datos.CargarComboCausas(cmbCausa);
             cmbMedicamentos.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             cmbMedicamentos.AutoCompleteSource = AutoCompleteSource.ListItems;
@@ -42,28 +47,101 @@ namespace Proyecto_Integrador
             cmbMedicamentos.Text = "Selecciona un medicamento"; // Establece el texto predeterminado del ComboBox
             cmbMedicamentos.Font = new Font("Verdana", 12);
             dtimeEntrada.Font = new Font("Verdana", 12);
-            guardarbtn.Enabled = false; // Deshabilita el botón de guardar al inicio
+            guardarbtn.Enabled = false; // Deshabilita el botÃ³n de guardar al inicio
             btnActualizar.Enabled = false;
-            List<string> tipos = new List<string> { "mL", "L", "µL", "cc", "gota", "cdita", "cda", "mg", "g", "kg", "mcg", "ng", "UI", "U", "mEq", "mol", "mmol", "UFC" };
+            List<string> tipos = new List<string> { "mL", "L", "ÂµL", "cc", "gota", "cdita", "cda", "mg", "g", "kg", "mcg", "ng", "UI", "U", "mEq", "mol", "mmol", "UFC" };
             cmbTipo.DataSource = tipos;
 
+            pacienteControl = new PacienteActivoControl();
+            pacienteControl.Dock = DockStyle.Fill;
+
         }
+
+        private FlowLayoutPanel flowLayoutPanelActivos;
+
+
+        private void InitializeActivosPanel()
+        {
+            flowLayoutPanelActivos = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                Visible = true, // Siempre visible dentro de la pestaï¿½a
+                Padding = new Padding(10)
+            };
+            Activos.Controls.Add(flowLayoutPanelActivos); // <-- Cambia aquï¿½
+        }
+
+        private void CargarPacientesActivos()
+        {
+            flowLayoutPanelActivos.Controls.Clear();
+
+            var datos = new Datos();
+            var pacientes = datos.ObtenerPacientesActivos();
+
+            foreach (var paciente in pacientes)
+            {
+                // 1. Obtener la ï¿½ltima estancia activa
+                var estancia = datos.ObtenerEstancias(paciente.id_Paciente);
+                if (estancia == null) continue;
+
+                // 2. Obtener la fecha de entrada
+
+
+                var FechaEntrada = datos.ObtenerFechaEntrada(estancia.Id);
+
+
+                // 3. Calcular dï¿½as internado
+                int diasInternado = (DateTime.Now - FechaEntrada).Days;
+
+                // 4. Obtener tratamiento
+                var tratamiento = datos.ObtenerTratamiento(estancia.Id);
+                if (tratamiento == null) continue;
+
+                // 5. Obtener medicamentos reales
+                var medicamentos = datos.ObtenertratamientoConMedicamentos(tratamiento.id_tratamiento);
+
+                // 6. Preparar diccionario para el control visual
+                var medsDict = new Dictionary<string, TimeSpan>();
+                foreach (var med in medicamentos.Where(m => m.UsoActualmente == "SI"))
+                {
+                    string nombre = med.Medicamento?.Nombre ?? "Medicamento";
+                    // Si tienes tiempo de administraciï¿½n, ï¿½salo. Si no, pon TimeSpan.Zero
+                    TimeSpan tiempo = TimeSpan.FromHours(med.tiempoAdministracion);
+                    medsDict[nombre] = tiempo;
+                }
+
+                // 7. Mostrar en el control visual
+                var pacienteControl = new PacienteActivoControl();
+                pacienteControl.SetPacienteInfo(
+                    paciente.id_Paciente,
+                    paciente.Nombres,
+                    paciente.Apellido_Paterno,
+                    paciente.Apellido_Materno,
+                    diasInternado,
+                    medsDict
+                );
+                flowLayoutPanelActivos.Controls.Add(pacienteControl);
+            }
+        }
+
+
 
 
         private void Form1_Load(object sender, EventArgs e)
         {
             try
             {
-                tabControlMenu.Appearance = TabAppearance.FlatButtons;// Establece el estilo de las pestañas la apariencia de las pestañas es plana
-                tabControlMenu.ItemSize = new Size(0, 2);// Establece el tamaño de las pestañas muy pequeño para que no se vean
-                tabControlMenu.SizeMode = TabSizeMode.Fixed;// Establece el modo de tamaño de las pestañas conbinado los dos anteriores oculta las pestañas
+                tabControlMenu.Appearance = TabAppearance.FlatButtons;// Establece el estilo de las pestaÃ±as la apariencia de las pestaÃ±as es plana
+                tabControlMenu.ItemSize = new Size(0, 2);// Establece el tamaÃ±o de las pestaÃ±as muy pequeÃ±o para que no se vean
+                tabControlMenu.SizeMode = TabSizeMode.Fixed;// Establece el modo de tamaÃ±o de las pestaÃ±as conbinado los dos anteriores oculta las pestaÃ±as
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Esto es un " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            // Establece la pestaña de inicio como la pestaña seleccionada al cargar el formulario
-            tabControlMenu.SelectedTab = Mensajebienvenida; // Establece la pestaña de inicio como la pestaña seleccionada al cargar el formulario
+            // Establece la pestaÃ±a de inicio como la pestaÃ±a seleccionada al cargar el formulario
+            tabControlMenu.SelectedTab = Mensajebienvenida; // Establece la pestaÃ±a de inicio como la pestaÃ±a seleccionada al cargar el formulario
 
 
             dgvDatos.Columns.Clear(); // Limpia columnas previas si las hay
@@ -71,10 +149,10 @@ namespace Proyecto_Integrador
             dgvDatos.Columns["Id_medicamento"].Visible = false; // Oculta la columna de ID
 
             dgvDatos.Columns.Add("Nombre", "Medicamento");
-            dgvDatos.Columns.Add("Administracion", "Administración (horas)");
+            dgvDatos.Columns.Add("Administracion", "AdministraciÃ³n (horas)");
             dgvDatos.Columns.Add("Cantidad", "Cantidad");
             dgvDatos.Columns.Add("Efecto_secundario", "Efecto Secundario");
-            dgvDatos.Columns["Administracion"].Width = 200; // Ajusta el ancho de la columna de administración
+            dgvDatos.Columns["Administracion"].Width = 200; // Ajusta el ancho de la columna de administraciÃ³n
             dgvDatos.Columns["Cantidad"].Width = 246; // Ajusta el ancho de la columna de cantidad
             dgvDatos.Columns["Nombre"].Width = 400; // Ajusta el ancho de la columna de nombre
             dgvDatos.Columns["Efecto_secundario"].Width = 200; // Ajusta el ancho de la columna de efecto secundario
@@ -85,8 +163,8 @@ namespace Proyecto_Integrador
         private void btnRegistar_Click(object sender, EventArgs e)
         {
 
-            tabControlMenu.SelectedTab = Registar; // Cambia a la pestaña de registro
-            Form Verificar = new Verificacion(this); // Crea una instancia del formulario de verificación
+            tabControlMenu.SelectedTab = Registar; // Cambia a la pestaÃ±a de registro
+            Form Verificar = new Verificacion(this); // Crea una instancia del formulario de verificaciÃ³n
             Verificar.Show();
 
 
@@ -94,12 +172,14 @@ namespace Proyecto_Integrador
 
         private void btnActivos_Click(object sender, EventArgs e)
         {
-            tabControlMenu.SelectedTab = Activos; // Cambia a la pestaña de activos
+            flowLayoutPanelActivos.Visible = true;// Muestra el panel de pacientes activos
+            tabControlMenu.SelectedTab = Activos; // Cambia a la pestaÃ±a de pacientes activos
+            CargarPacientesActivos();// Carga los pacientes activos en el panel
         }
 
         private void btnHistorial_Click(object sender, EventArgs e)
         {
-            tabControlMenu.SelectedTab = Historial; // Cambia a la pestaña de historial
+            tabControlMenu.SelectedTab = Historial; // Cambia a la pestaÃ±a de historial
         }
 
         private void label5_Click(object sender, EventArgs e) { }
@@ -110,7 +190,7 @@ namespace Proyecto_Integrador
             ValidarFormulario();
             // Crea una instancia de la clase datos
             var datos = new Datos();
-            // Obtiene el médico seleccionado del ComboBox
+            // Obtiene el mÃ©dico seleccionado del ComboBox
             Medico medico = (Medico)cmbMedico.SelectedItem;
             Causas causa = (Causas)cmbCausa.SelectedItem;
             //Datos personales del paciente
@@ -122,7 +202,7 @@ namespace Proyecto_Integrador
             int respuesta2 = rbtnSIEstudiosClinicos.Checked ? 1 : 0;// verifica que si se seleciono Si
             DateTime fechaEntrada = dtimeEntrada.Value;
             DateTime fechaDefecto = new DateTime(2000, 1, 1, 0, 0, 0);
-            // Año, mes, día, hora, minuto, segundo
+            // AÃ±o, mes, dÃ­a, hora, minuto, segundo
             //tratamiento del paciente
             string efectos = txtEfectoSecundario.Text;
             //Medico que atiende al paciente
@@ -193,13 +273,13 @@ namespace Proyecto_Integrador
         {
             ValidarFormulario();
 
-            // Obtiene el médico seleccionado del ComboBox
+            // Obtiene el mÃ©dico seleccionado del ComboBox
             Medico medico = (Medico)cmbMedico.SelectedItem;
             Causas causa = (Causas)cmbCausa.SelectedItem;
             //Datos Medicos del paciente
             int respuesta2 = rbtnSIEstudiosClinicos.Checked ? 1 : 0;// verifica que si se seleciono Si
             DateTime fechaEntrada = dtimeEntrada.Value;
-            DateTime fechaDefecto = new DateTime(2000, 1, 1, 0, 0, 0); // Año, mes, día, hora, minuto, segundo
+            DateTime fechaDefecto = new DateTime(2000, 1, 1, 0, 0, 0); // AÃ±o, mes, dÃ­a, hora, minuto, segundo
             //tratamiento del paciente
             string efectos = txtEfectoSecundario.Text;
             var dato = new Datos();
@@ -305,7 +385,7 @@ namespace Proyecto_Integrador
                             int tiempoAdministracion = Convert.ToInt32(row.Cells["Administracion"].Value);
                             string efectoSecundario = row.Cells["Efecto_secundario"].Value?.ToString() ?? string.Empty;
                             bool estaEnUso = idsEnUso.Contains(idMedicamento);
-                          
+
                             bool existeInactivo = UsoActualmente.Any(m => m.id_medicamento == idMedicamento && m.UsoActualmente == "NO");
 
                             if (existeInactivo)
@@ -345,11 +425,11 @@ namespace Proyecto_Integrador
 
                                 dato.Insertar("tratamiento_medicamento", datosTratamientoMedicamento);
                             }
-                    
+
                         }
                     }
 
-               
+
                 }
 
 
@@ -358,14 +438,14 @@ namespace Proyecto_Integrador
             limpiar();
 
         }
-      
+
 
         private void txtCurp_TextChanged(object sender, EventArgs e)
         {
             int longitud = txtCurp.Text.Length;
             if (longitud > 18)
             {
-                MessageBox.Show("La CURP no puede tener más de 18 caracteres.");
+                MessageBox.Show("La CURP no puede tener mÃ¡s de 18 caracteres.");
 
                 txtCurp.Text = txtCurp.Text.Substring(0, 18); // Limita la CURP a 18 caracteres
             }
@@ -380,7 +460,7 @@ namespace Proyecto_Integrador
 
         }
 
-        // Evento para añadir los datos necesarios al DataGridView
+        // Evento para aÃ±adir los datos necesarios al DataGridView
         private void btnAgregar_Click(object sender, EventArgs e)
         {
             if (cmbMedicamentos.SelectedItem is Medicamento medicamentoElegido &&
@@ -390,7 +470,7 @@ namespace Proyecto_Integrador
                 string secundario = txtEfectoSecundario.Text;
 
                 _ = dgvDatos.Rows.Add(medicamentoElegido.Id, medicamentoElegido.Nombre, administracion, cantidad, secundario);
-                //_ sirve para ignorar el valor de retorno del método Rows.Add
+                //_ sirve para ignorar el valor de retorno del mÃ©todo Rows.Add
                 cmbMedicamentos.SelectedIndex = -1;//Regresa a una pocision anterior
                 txtAdministracion.Clear();//
                 txtCantidad.Clear();
@@ -507,42 +587,42 @@ namespace Proyecto_Integrador
         //VALIDAR PARA ACTIVAR EL BOTON
         private void txtNombres_TextChanged(object sender, EventArgs e)
         {
-           ValidarFormulario();
+            ValidarFormulario();
         }
 
         private void txtApellidoMaterno_TextChanged(object sender, EventArgs e)
         {
-         ValidarFormulario();
+            ValidarFormulario();
         }
 
         private void txtApellidoPaterno_TextChanged(object sender, EventArgs e)
         {
-           ValidarFormulario();
+            ValidarFormulario();
         }
 
         private void txtEfectoSecundario_TextChanged(object sender, EventArgs e)
         {
-           
+
         }
 
 
         private void cmbMedico_SelectedIndexChanged(object sender, EventArgs e)
         {
-          ValidarFormulario();
+            ValidarFormulario();
         }
         private void cmbCausa_SelectedIndexChanged(object sender, EventArgs e)
         {
-          ValidarFormulario();
+            ValidarFormulario();
         }
 
         private void DgvDatos_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-           ValidarFormulario();
+            ValidarFormulario();
         }
 
         private void DgvDatos_RowsChanged(object sender, EventArgs e)
         {
-          ValidarFormulario();  
+            ValidarFormulario();
         }
 
         private void limpiar()
@@ -558,8 +638,8 @@ namespace Proyecto_Integrador
             txtAdministracion.Clear();//
             txtCantidad.Clear();
             txtEfectoSecundario.Clear();
-            dgvDatos.Rows.Clear(); // Limpia el DataGridView después de actualizar
-            btnActualizar.Visible = false; // Deshabilita el botón de actualizar después de guardar
+            dgvDatos.Rows.Clear(); // Limpia el DataGridView despuÃ©s de actualizar
+            btnActualizar.Visible = false; // Deshabilita el botÃ³n de actualizar despuÃ©s de guardar
             guardarbtn.Visible = true;
         }
 
@@ -607,7 +687,7 @@ namespace Proyecto_Integrador
             {
                 ValidarFormularioPacienteActivo();
             }
-            else if(activo==0)
+            else if (activo == 0)
             {
                 ValidarFormularioPacienteInactivo();
             }
@@ -620,9 +700,9 @@ namespace Proyecto_Integrador
 
         private void ValidarFormularioPacienteActivo()
         {
-        
 
-            // Solo permitir si hay exactamente una fila válida
+
+            // Solo permitir si hay exactamente una fila vÃ¡lida
             int filasValidas = dgvDatos.Rows.Cast<DataGridViewRow>()
                 .Count(row => !row.IsNewRow && row.Cells.Cast<DataGridViewCell>().Any(cell => cell.Value != null));
 
@@ -638,7 +718,7 @@ namespace Proyecto_Integrador
         }
 
 
-
+        // FunciÃ³n para validar el formulario de pacientes inactivos
         private void ValidarFormularioPacienteInactivo()
         {
             bool textBoxesLlenos = !string.IsNullOrWhiteSpace(txtNombres.Text) &&
@@ -662,7 +742,7 @@ namespace Proyecto_Integrador
                 btnActualizar.Enabled = false;
             }
         }
-
+        // FunciÃ³n para validar el formulario de pacientes nuevos
         private void ValidarFormularioPacienNuevos()
         {
             bool textBoxesLlenos = !string.IsNullOrWhiteSpace(txtNombres.Text) &&
@@ -678,7 +758,7 @@ namespace Proyecto_Integrador
 
             if (textBoxesLlenos && comboSeleccionados && comboCausa && dataGridConDatos)
             {
-               
+
                 guardarbtn.Enabled = true;
             }
             else
@@ -689,15 +769,29 @@ namespace Proyecto_Integrador
 
 
 
-        // Función para permitir solo letras y números en el campo CURP
+
+
+        // FunciÃ³n para permitir solo letras y nÃºmeros en el campo CURP
         private void txtCurp_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsLetterOrDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
             {
-                e.Handled = true; // Cancela la entrada del carácter
+                e.Handled = true; // Cancela la entrada del carÃ¡cter
             }
         }
 
+        private void Principal_FormClosing(object sender, FormClosingEventArgs e)
+        {
+
+            foreach (Control ctrl in flowLayoutPanelActivos.Controls)
+            {
+                if (ctrl is PacienteActivoControl pacCtrl)
+                {
+                    pacCtrl.GuardarEstado();
+                }
+            }
+
+        }
     }
 
 }

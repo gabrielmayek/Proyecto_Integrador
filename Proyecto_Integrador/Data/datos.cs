@@ -34,9 +34,9 @@ namespace Proyecto_Integrador.Data
             using (MySqlConnection conexion = new MySqlConnection(CadenaConexion))
             {
                 MySqlCommand comando = new MySqlCommand(consulta, conexion);
-   
+
                 foreach (var dato in datos)
-         
+
                 {
                     comando.Parameters.AddWithValue("@" + dato.Key, dato.Value);
                 }
@@ -267,7 +267,7 @@ namespace Proyecto_Integrador.Data
         // Método para obtener el estado actual de un paciente por su CURP
         public int EstadoActual(string curp)//
         {
-          
+
             string query = $"select estado_actual from paciente where curp='{curp}'";
             using (MySqlConnection connection = new MySqlConnection(CadenaConexion))
             {
@@ -365,6 +365,61 @@ namespace Proyecto_Integrador.Data
 
             return datos;
         }
+
+        // Método para obtener todos los pacientes activos
+        public List<Paciente> ObtenerPacientesActivos()
+        {
+            var lista = new List<Paciente>();
+            using (var connection = new MySqlConnection(CadenaConexion))
+            {
+                connection.Open();
+                string query = "SELECT * FROM paciente WHERE estado_actual = 1";
+                using (var command = new MySqlCommand(query, connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Paciente
+                        {
+                            id_Paciente = reader.GetInt32("id_paciente"),
+                            Nombres = reader.GetString("nombres"),
+                            Apellido_Paterno = reader.GetString("apellido_paterno"),
+                            Apellido_Materno = reader.GetString("apellido_materno"),
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+        // Método para obtener la fecha de entrada de una estancia por su ID
+        public  DateTime ObtenerFechaEntrada(int id)
+        {
+            DateTime fechaEntrada = DateTime.MinValue;
+            using (var connection = new MySql.Data.MySqlClient.MySqlConnection(CadenaConexion))
+            {
+                connection.Open();
+                string query = $"SELECT fecha_entrada FROM estancias WHERE id_estadia={id}";
+
+                try
+                {
+                    using (var command = new MySql.Data.MySqlClient.MySqlCommand(query, connection))
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            fechaEntrada = reader.GetDateTime("fecha_entrada");
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al obtener la fecha de entrada: " + ex.Message);
+                }
+                return fechaEntrada;
+            }
+        }
+
         // Método para obtener la última estancia de un paciente por su ID
         public Estancias ObtenerEstancias(int id)
         {

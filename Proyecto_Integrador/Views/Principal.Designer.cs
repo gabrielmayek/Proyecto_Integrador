@@ -38,7 +38,6 @@ namespace Proyecto_Integrador
             Historial = new TabPage();
             label3 = new Label();
             Activos = new TabPage();
-            flowLayoutPanel1 = new FlowLayoutPanel();
             Registar = new TabPage();
             panelRegistrar = new Panel();
             btnActualizar = new Button();
@@ -81,7 +80,6 @@ namespace Proyecto_Integrador
             errorProvider1 = new ErrorProvider(components);
             panel1.SuspendLayout();
             Historial.SuspendLayout();
-            Activos.SuspendLayout();
             Registar.SuspendLayout();
             panelRegistrar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvDatos).BeginInit();
@@ -172,7 +170,6 @@ namespace Proyecto_Integrador
             // Activos
             // 
             Activos.BackColor = Color.FromArgb(129, 166, 100);
-            Activos.Controls.Add(flowLayoutPanel1);
             Activos.Font = new Font("Segoe UI", 16.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Activos.Location = new Point(4, 29);
             Activos.Name = "Activos";
@@ -180,13 +177,6 @@ namespace Proyecto_Integrador
             Activos.Size = new Size(994, 683);
             Activos.TabIndex = 1;
             Activos.Text = "Activos";
-            // 
-            // flowLayoutPanel1
-            // 
-            flowLayoutPanel1.Location = new Point(0, 15);
-            flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(994, 662);
-            flowLayoutPanel1.TabIndex = 0;
             // 
             // Registar
             // 
@@ -689,11 +679,11 @@ namespace Proyecto_Integrador
             SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Control del cuidado del paciente";
+            FormClosing += Principal_FormClosing;
             Load += Form1_Load;
             panel1.ResumeLayout(false);
             Historial.ResumeLayout(false);
             Historial.PerformLayout();
-            Activos.ResumeLayout(false);
             Registar.ResumeLayout(false);
             Registar.PerformLayout();
             panelRegistrar.ResumeLayout(false);
@@ -761,7 +751,6 @@ namespace Proyecto_Integrador
         private ComboBox cmbMedico;
         private Button btnAgregar;
         private ErrorProvider errorProvider1;
-        private FlowLayoutPanel flowLayoutPanel1;
         private Button btnEliminar;
         private ComboBox cmbCausa;
         private Label label2;
