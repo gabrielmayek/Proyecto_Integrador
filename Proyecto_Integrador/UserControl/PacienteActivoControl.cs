@@ -48,12 +48,15 @@ namespace Proyecto_Integrador
 
             // Inicializar los diccionarios
             tiemposOriginales = new Dictionary<string, TimeSpan>(medicamentos);
-            tiemposRestantes = estadoCargado ?? new Dictionary<string, TimeSpan>(medicamentos);
 
             if (estadoCargado != null)
             {
-                tiemposRestantes = new Dictionary<string, TimeSpan>(estadoCargado);
+                // Filtrar solo los medicamentos activos
+                tiemposRestantes = estadoCargado
+                    .Where(kvp => medicamentos.ContainsKey(kvp.Key))
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
+                // Agregar medicamentos nuevos que no estaban en el estado guardado
                 foreach (var med in medicamentos)
                 {
                     if (!tiemposRestantes.ContainsKey(med.Key))
@@ -118,7 +121,6 @@ namespace Proyecto_Integrador
         }
 
 
-
         private void Timer_Tick(object sender, EventArgs e)
         {
             if (tiemposRestantes == null) return;
@@ -127,6 +129,10 @@ namespace Proyecto_Integrador
             for (int i = 0; i < keys.Count; i++)
             {
                 var key = keys[i];
+
+                // Verificar que la clave exista en tiemposOriginales
+                if (!tiemposOriginales.ContainsKey(key))
+                    continue;
 
                 if (tiemposRestantes[key] > TimeSpan.Zero)
                 {
@@ -177,6 +183,7 @@ namespace Proyecto_Integrador
                 labelsTiempos[i].BackColor = color;
             }
         }
+
 
         // Función para interpolar colores
         private Color InterpolarColor(Color inicio, Color fin, double porcentaje)
