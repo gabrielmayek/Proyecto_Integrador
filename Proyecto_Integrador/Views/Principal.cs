@@ -1,5 +1,4 @@
-﻿
-using Proyecto_Integrador.Data;
+﻿using Proyecto_Integrador.Data;
 using Proyecto_Integrador.Models;
 using System;
 using System.Reflection.Metadata;
@@ -58,6 +57,7 @@ namespace Proyecto_Integrador
         }
 
         private FlowLayoutPanel flowLayoutPanelActivos;
+        private FlowLayoutPanel flowHistorial; //kevin
 
 
         private void InitializeActivosPanel()
@@ -181,6 +181,7 @@ namespace Proyecto_Integrador
         private void btnHistorial_Click(object sender, EventArgs e)
         {
             tabControlMenu.SelectedTab = Historial; // Cambia a la pestaña de historial
+            CargarHistorial(); //kevin
         }
 
         private void label5_Click(object sender, EventArgs e) { }
@@ -256,7 +257,7 @@ namespace Proyecto_Integrador
                    {
                         {"id_tratamiento",id_tratamiento },
                         { "id_medicamento", idMedicamento },
-                        {"Uso_Actualmente","SI" },
+                        {"Uso_ Actualmente","SI" },
                         { "cantidad", cantidad },
                         { "tiempo_administracion", tiempoAdministracion },
                         {"efecto_secundario", efectoSecundario },
@@ -267,7 +268,7 @@ namespace Proyecto_Integrador
                 }
             }
             limpiar();
-
+            CargarHistorial(); //kevin
         }
 
         private void btnActualizar_Click(object sender, EventArgs e)
@@ -341,7 +342,7 @@ namespace Proyecto_Integrador
                         {"id_tratamiento",id_tratamiento },
                         { "id_medicamento", idMedicamento },
                         { "cantidad", cantidad },
-                        {"Uso_Actualmente" ,"SI"},
+                        {"Uso_ Actualmente" ,"SI"},
                         { "tiempo_administracion", tiempoAdministracion },
                         {"efecto_secundario", efectoSecundario },
 
@@ -387,7 +388,7 @@ namespace Proyecto_Integrador
                             string efectoSecundario = row.Cells["Efecto_secundario"].Value?.ToString() ?? string.Empty;
                             bool estaEnUso = idsEnUso.Contains(idMedicamento);
 
-                            bool existeInactivo = UsoActualmente.Any(m => m.id_medicamento == idMedicamento && m.UsoActualmente == "NO");
+                            bool existeInactivo = UsoActualmente.Any(m => m.id_medicamento == idMedicamento && m.UsoActualmente == "NO"); //kevin
 
                             if (existeInactivo)
                             {
@@ -397,12 +398,12 @@ namespace Proyecto_Integrador
                                 {
                                     {"id_tratamiento", tratamiento.id_tratamiento},
                                     {"id_medicamento", idMedicamento},
-                                    {"Uso_Actualmente", "NO"}
+                                    {"Uso_ Actualmente", "NO"}
                                 };
 
                                 var ActivarMedicamento = new Dictionary<string, object>
                                 {
-                                    {"Uso_Actualmente", "SI"},
+                                    {"Uso_ Actualmente", "SI"},
                                     {"cantidad", cantidad},
                                     {"tiempo_administracion", tiempoAdministracion},
                                     {"efecto_secundario", efectoSecundario}
@@ -419,7 +420,7 @@ namespace Proyecto_Integrador
                                     { "id_tratamiento", tratamiento.id_tratamiento },
                                     { "id_medicamento", idMedicamento },
                                     { "cantidad", cantidad },
-                                    { "Uso_Actualmente", "SI" },
+                                    { "Uso_ Actualmente", "SI" },
                                     { "tiempo_administracion", tiempoAdministracion },
                                     { "efecto_secundario", efectoSecundario }
                                 };
@@ -437,7 +438,7 @@ namespace Proyecto_Integrador
 
             }
             limpiar();
-
+            CargarHistorial(); //kevin
         }
 
 
@@ -770,8 +771,6 @@ namespace Proyecto_Integrador
 
 
 
-
-
         // Función para permitir solo letras y números en el campo CURP
         private void txtCurp_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -793,7 +792,88 @@ namespace Proyecto_Integrador
             }
 
         }
-    }
+        //kevin: Agrego método para cargar el historial en la pestaña Historial
+        private void CargarHistorial() //kevin
+        {
+            if (flowHistorial == null) //kevin
+            {
+                flowHistorial = new FlowLayoutPanel //kevin
+                {
+                    Name = "flowHistorial", //kevin
+                    Location = new System.Drawing.Point(50, 100), //kevin
+                    Size = new System.Drawing.Size(900, 500), //kevin
+                    AutoScroll = true, //kevin
+                    BackColor = System.Drawing.Color.FromArgb(129, 166, 100) //kevin
+                };
+                Historial.Controls.Add(flowHistorial); //kevin
+            }
+            flowHistorial.Controls.Clear(); //kevin
+            var datos = new Datos(); //kevin
+            var pacientes = datos.ObtenerPacientesHistorial(); //kevin
+            int i = 1; //kevin
+            foreach (var paciente in pacientes) //kevin
+            {
+                var btn = new System.Windows.Forms.Button //kevin
+                {
+                    Text = $"Paciente {i}: {paciente.Nombres} {paciente.Apellido_Paterno}", //kevin
+                    Tag = paciente, //kevin
+                    Width = 800, //kevin
+                    Height = 50, //kevin
+                    Margin = new Padding(10), //kevin
+                    BackColor = System.Drawing.Color.FromArgb(177, 232, 134), //kevin
+                    Font = new System.Drawing.Font("Verdana", 14, System.Drawing.FontStyle.Bold) //kevin
+                };
+                btn.Click += (s, e) => MostrarPlantillaPaciente((Paciente)btn.Tag); //kevin
+                flowHistorial.Controls.Add(btn); //kevin
+                i++; //kevin
+            }
+        }
 
+        //kevin: Método para mostrar la plantilla del paciente al hacer click en el botón
+        private void MostrarPlantillaPaciente(Paciente paciente) //kevin
+        {
+            Form plantilla = new Form //kevin
+            {
+                Width = 900, //kevin
+                Height = 600, //kevin
+                BackColor = System.Drawing.Color.FromArgb(129, 166, 100), //kevin
+                Text = $"Paciente {paciente.Nombres} {paciente.Apellido_Paterno}", //kevin
+                StartPosition = FormStartPosition.CenterScreen //kevin
+            };
+            var panel = new Panel //kevin
+            {
+                BackColor = System.Drawing.Color.FromArgb(150, 180, 120), //kevin
+                Location = new System.Drawing.Point(40, 40), //kevin
+                Size = new System.Drawing.Size(800, 500) //kevin
+            };
+            plantilla.Controls.Add(panel); //kevin
+            var lblTitulo = new Label //kevin
+            {
+                Text = $"Paciente {paciente.id_Paciente}", //kevin
+                Location = new System.Drawing.Point(20, 10), //kevin
+                Font = new System.Drawing.Font("Verdana", 16, System.Drawing.FontStyle.Bold), //kevin
+                ForeColor = System.Drawing.Color.White, //kevin
+                AutoSize = true //kevin
+            };
+            panel.Controls.Add(lblTitulo); //kevin
+            var lblNombres = new Label { Text = $"Nombres: {paciente.Nombres}", Location = new System.Drawing.Point(20, 50), Width = 600, Font = new System.Drawing.Font("Verdana", 12), ForeColor = System.Drawing.Color.White }; //kevin
+            var lblApellidos = new Label { Text = $"Apellidos: {paciente.Apellido_Paterno} {paciente.Apellido_Materno}", Location = new System.Drawing.Point(20, 90), Width = 600, Font = new System.Drawing.Font("Verdana", 12), ForeColor = System.Drawing.Color.White }; //kevin
+            var lblCurp = new Label { Text = $"Curp: {paciente.Curp}", Location = new System.Drawing.Point(20, 130), Width = 600, Font = new System.Drawing.Font("Verdana", 12), ForeColor = System.Drawing.Color.White }; //kevin
+            var lblFechaEntrada = new Label { Text = "Fecha de entrada: ______________", Location = new System.Drawing.Point(20, 180), Width = 300, Font = new System.Drawing.Font("Verdana", 12), ForeColor = System.Drawing.Color.White }; //kevin
+            var lblFechaSalida = new Label { Text = "Fecha de salida: ______________", Location = new System.Drawing.Point(400, 180), Width = 300, Font = new System.Drawing.Font("Verdana", 12), ForeColor = System.Drawing.Color.White }; //kevin
+            var txtDescripcion = new System.Windows.Forms.TextBox { Text = "Descripcion.", Location = new System.Drawing.Point(20, 230), Size = new System.Drawing.Size(700, 100), Multiline = true, Font = new System.Drawing.Font("Verdana", 12) }; //kevin
+            var lblDoctor = new Label { Text = "Doctor:", Location = new System.Drawing.Point(20, 350), Width = 300, Font = new System.Drawing.Font("Verdana", 12), ForeColor = System.Drawing.Color.White }; //kevin
+            var lblCedula = new Label { Text = "Numero de cedula:", Location = new System.Drawing.Point(400, 350), Width = 300, Font = new System.Drawing.Font("Verdana", 12), ForeColor = System.Drawing.Color.White }; //kevin
+            panel.Controls.Add(lblNombres); //kevin
+            panel.Controls.Add(lblApellidos); //kevin
+            panel.Controls.Add(lblCurp); //kevin
+            panel.Controls.Add(lblFechaEntrada); //kevin
+            panel.Controls.Add(lblFechaSalida); //kevin
+            panel.Controls.Add(txtDescripcion); //kevin
+            panel.Controls.Add(lblDoctor); //kevin
+            panel.Controls.Add(lblCedula); //kevin
+            plantilla.ShowDialog(); //kevin
+        }
+    }
 }
 

@@ -17,7 +17,7 @@ namespace Proyecto_Integrador.Data
     internal class Datos
     {
         //APARTADO REGISTRAR GABRIEL EDUARDO MAY EK
-        private string CadenaConexion = "Server=localhost;User=root;Password=admin;Port=3306;database=Proyecto_integrador";
+        private string CadenaConexion = "Server=localhost;User=root;Password=root;Port=3306;database=proyecto_integrador";
 
         //Insertar datos en la base de datos
         public int Insertar(string tabla, Dictionary<string, object> datos)
@@ -591,10 +591,35 @@ namespace Proyecto_Integrador.Data
         }
 
 
-       
-
         //APARTADO HISTORIAL
-
+        //kevin: Método para obtener todos los pacientes dados de alta (historial)
+        public List<Paciente> ObtenerPacientesHistorial() //kevin
+        {
+            var lista = new List<Paciente>(); //kevin
+            using (var connection = new MySqlConnection(CadenaConexion)) //kevin
+            {
+                connection.Open(); //kevin
+                //kevin: Se consideran pacientes de historial los que tienen estado_actual = 0
+                string query = "SELECT * FROM paciente WHERE estado_actual = 0"; //kevin
+                using (var command = new MySqlCommand(query, connection)) //kevin
+                using (var reader = command.ExecuteReader()) //kevin
+                {
+                    while (reader.Read()) //kevin
+                    {
+                        lista.Add(new Paciente //kevin
+                        {
+                            id_Paciente = reader.GetInt32("id_paciente"), //kevin
+                            Nombres = reader.GetString("nombres"), //kevin
+                            Apellido_Paterno = reader.GetString("apellido_paterno"), //kevin
+                            Apellido_Materno = reader.GetString("apellido_materno"), //kevin
+                            Curp = reader.GetString("curp"), //kevin
+                            estado_actual = reader.GetInt32("estado_actual") //kevin
+                        });
+                    }
+                }
+            }
+            return lista; //kevin
+        }
     }
 }
 
