@@ -36,7 +36,6 @@ namespace Proyecto_Integrador
             btnActivos = new Button();
             btnRegistar = new Button();
             Historial = new TabPage();
-            label3 = new Label();
             Activos = new TabPage();
             Registar = new TabPage();
             panelRegistrar = new Panel();
@@ -79,7 +78,6 @@ namespace Proyecto_Integrador
             label4 = new Label();
             errorProvider1 = new ErrorProvider(components);
             panel1.SuspendLayout();
-            Historial.SuspendLayout();
             Registar.SuspendLayout();
             panelRegistrar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvDatos).BeginInit();
@@ -149,7 +147,6 @@ namespace Proyecto_Integrador
             // Historial
             // 
             Historial.BackColor = Color.FromArgb(129, 166, 100);
-            Historial.Controls.Add(label3);
             Historial.Font = new Font("Segoe UI", 16.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Historial.Location = new Point(4, 29);
             Historial.Name = "Historial";
@@ -157,15 +154,6 @@ namespace Proyecto_Integrador
             Historial.Size = new Size(994, 683);
             Historial.TabIndex = 2;
             Historial.Text = "Historial";
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(377, 51);
-            label3.Name = "label3";
-            label3.Size = new Size(279, 38);
-            label3.TabIndex = 0;
-            label3.Text = "Apartado de Historial";
             // 
             // Activos
             // 
@@ -682,8 +670,6 @@ namespace Proyecto_Integrador
             FormClosing += Principal_FormClosing;
             Load += Form1_Load;
             panel1.ResumeLayout(false);
-            Historial.ResumeLayout(false);
-            Historial.PerformLayout();
             Registar.ResumeLayout(false);
             Registar.PerformLayout();
             panelRegistrar.ResumeLayout(false);
@@ -714,7 +700,6 @@ namespace Proyecto_Integrador
         private Button btnHistorial;
         private Button btnActivos;
         private TabPage Historial;
-        private Label label3;
         private TabPage Activos;
         private TabPage Registar;
         private Label label1;

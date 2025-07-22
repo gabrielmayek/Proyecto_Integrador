@@ -141,7 +141,7 @@ namespace Proyecto_Integrador.Data
                         listaMedicamentos.Add(new Medicamento
                         {
 
-                            Id = reader.GetInt32("id_medicamentos"),
+                            Id_medicamento= reader.GetInt32("id_medicamentos"),
                             //siempre se debe obtener el ID del medicamento para poder usarlo más tarde 
                             Nombre = reader.GetString("nombre_medicamento")
                             // Obtener el nombre del medicamento desde el lector de datos
@@ -149,12 +149,12 @@ namespace Proyecto_Integrador.Data
                     }
                     listaMedicamentos.Insert(0, new Medicamento
                     {
-                        Id = 0,// Agregar un elemento al inicio de la lista con ID 0 y nombre "Seleccione un medicamento..."
+                        Id_medicamento = 0,// Agregar un elemento al inicio de la lista con ID 0 y nombre "Seleccione un medicamento..."
                         Nombre = "selecione un medicamento..."
                     });
                     comboBox.DataSource = listaMedicamentos;// Asignar la lista de medicamentos como fuente de datos del ComboBox
                     comboBox.DisplayMember = "Nombre"; // Lo que se muestra
-                    comboBox.ValueMember = "Id"; // El valor asociado
+                    comboBox.ValueMember = "Id_medicamento"; // El valor asociado
                 }
                 catch (Exception ex)
                 {
@@ -205,7 +205,7 @@ namespace Proyecto_Integrador.Data
                 }
             }
         }
-
+        // Método para cargar un ComboBox con las causas desde la base de datos
         public void CargarComboCausas(ComboBox comboBox)
         {
             string query = "select * from causas";
@@ -420,6 +420,38 @@ namespace Proyecto_Integrador.Data
             }
         }
 
+
+        public DateTime ObtenerFechaSalida(int id)
+        {
+            DateTime fechaSalida = DateTime.MinValue;
+            using (var connection = new MySql.Data.MySqlClient.MySqlConnection(CadenaConexion))
+            {
+                connection.Open();
+                string query = $"SELECT fecha_salida FROM estancias WHERE id_estadia={id} ORDER BY fecha_salida DESC LIMIT 1;";
+
+                try
+                {
+                    using (var command = new MySql.Data.MySqlClient.MySqlCommand(query, connection))
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            fechaSalida = reader.GetDateTime("fecha_salida");
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al obtener la fecha de entrada: " + ex.Message);
+                }
+                return fechaSalida;
+            }
+        }
+
+
+
+
         // Método para obtener la última estancia de un paciente por su ID
         public Estancias ObtenerEstancias(int id)
         {
@@ -509,7 +541,7 @@ namespace Proyecto_Integrador.Data
                     {
                         medicamentos.Add(new Medicamento
                         {
-                            Id = reader.GetInt32("id_medicamentos"),
+                            Id_medicamento = reader.GetInt32("id_medicamentos"),
                             Nombre = reader.GetString("nombre_medicamento")
                         });
                     }
@@ -534,7 +566,7 @@ namespace Proyecto_Integrador.Data
                         };
 
                         // Relacionar con producto
-                        dato.Medicamento = medicamentos.FirstOrDefault(p => p.Id == dato.id_medicamento);
+                        dato.Medicamento = medicamentos.FirstOrDefault(p => p.Id_medicamento == dato.id_medicamento);
                         tratamientos.Add(dato);
                     }
                 }
@@ -542,27 +574,6 @@ namespace Proyecto_Integrador.Data
 
             return tratamientos;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -591,9 +602,102 @@ namespace Proyecto_Integrador.Data
         }
 
 
-       
+
 
         //APARTADO HISTORIAL
+        // Kevin: Obtener el médico de un paciente (última estancia)
+        public List<Paciente> ObtenerTodosPacientes()
+        {
+            var lista = new List<Paciente>();
+            using (var connection = new MySqlConnection(CadenaConexion))
+            {
+                connection.Open();
+                string query = "SELECT * FROM paciente WHERE nombres IS NOT NULL AND curp IS NOT NULL AND apellido_paterno IS NOT NULL AND apellido_materno IS NOT NULL and estado_actual='0'";
+                using (var command = new MySqlCommand(query, connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Paciente
+                        {
+                            id_Paciente = reader.GetInt32("id_paciente"),
+                            Nombres = reader.GetString("nombres"),
+                            Apellido_Paterno = reader.GetString("apellido_paterno"),
+                            Apellido_Materno = reader.GetString("apellido_materno"),
+                            Curp = reader.GetString("curp")
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+        public Medico ObtenerMedicoPorPaciente(int idPaciente)
+        {
+            Medico medico = null;
+            using (var connection = new MySqlConnection(CadenaConexion))
+            {
+                connection.Open();
+                string query = @"SELECT m.* FROM tratamiento t
+                                    JOIN estancias e ON t.id_estancia = e.id_estadia
+                                    JOIN datos_del_medico m ON t.id_medico = m.id_medico
+                                    WHERE e.id_paciente = @idPaciente
+                                    ORDER BY e.fecha_entrada DESC LIMIT 1";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@idPaciente", idPaciente);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            medico = new Medico
+                            {
+                                id_medico = reader.GetInt32("id_medico"),
+                                nombres = reader.GetString("nombres"),
+                                cedula = reader.GetInt32("cedula"),
+                                apellido_paterno = reader.GetString("apellido_paterno"),
+                                apellido_materno = reader.GetString("apellido_materno")
+                            };
+                        }
+                    }
+                }
+            }
+            return medico;
+        }
+
+        // Kevin: Obtener la causa de un paciente (última estancia)
+        public Causas ObtenerCausaPorPaciente(int idPaciente)
+        {
+            Causas causa = null;
+            using (var connection = new MySqlConnection(CadenaConexion))
+            {
+                connection.Open();
+                string query = @"SELECT c.* FROM tratamiento t
+                                    JOIN estancias e ON t.id_estancia = e.id_estadia
+                                    JOIN causas c ON t.id_causa = c.id_causas
+                                    WHERE e.id_paciente = @idPaciente
+                                    ORDER BY e.fecha_entrada DESC LIMIT 1";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@idPaciente", idPaciente);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            causa = new Causas
+                            {
+                                Id_causas = reader.GetInt32("id_causas"),
+                                causa = reader.GetString("causas")
+                            };
+                        }
+                    }
+                }
+            }
+            return causa;
+        }
+
+
+
+
 
     }
 }

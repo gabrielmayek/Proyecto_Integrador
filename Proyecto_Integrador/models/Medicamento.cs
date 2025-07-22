@@ -8,7 +8,7 @@ namespace Proyecto_Integrador.Models
 {
     internal class Medicamento
     {
-        public int Id { get; set; }
+        public int Id_medicamento { get; set; }
         public string? Nombre { get; set; }
 
         public override string ToString()
